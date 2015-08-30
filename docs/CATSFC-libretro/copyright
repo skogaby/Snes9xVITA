@@ -1,0 +1,89 @@
+ndssfc
+Copyright (C) 2010 dking <dking024@gmail.com>,
+  GBAtemp users BassAceGold, ShadauxCat and Nebuleon
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+Some source code with this sdk belong to the source's author, copyright 
+information are in the source files.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
+- - - Based on - - -
+
+Snes9x 1.43 (c) contributors; see a list in any source file under source/.
+
+Permission to use, copy, modify and distribute Snes9x in both binary and
+source form, for non-commercial purposes, is hereby granted without fee,
+providing that this license information and copyright notice appear with
+all copies and any derived work.
+ 
+This software is provided 'as-is', without any express or implied
+warranty. In no event shall the authors be held liable for any damages
+arising from the use of this software.
+ 
+Snes9x is freeware for PERSONAL USE only. Commercial users should
+seek permission of the copyright holders first. Commercial use includes
+charging money for Snes9x or software derived from Snes9x.
+ 
+The copyright holders request that bug fixes and improvements to the code
+should be forwarded to them so everyone can benefit from the modifications
+in future versions.
+
+- - - Using icons - - -
+
+SNES controller icon from the Gaming Icons Pack by deviantART user deleket.
+
+Some rights reserved. This work is licensed under a Creative Commons
+Attribution-Noncommercial-No Derivative Works 3.0 License.
+
+See it here: http://deleket.deviantart.com/art/Gaming-Icons-Pack-42723812
+
+The full text of the license is found here:
+http://creativecommons.org/licenses/by-nc-nd/3.0/
+
+----
+
+sbutto.svg, smaini.svg, smnsel.svg, smsel.svg, smsgfr.svg, snmaini.svg,
+  stitle.svg, subsela.svg:
+
+Created by GBAtemp user Nebuleon.
+
+Some rights reserved. This work is licensed under a Creative Commons
+Attribution-ShareAlike 3.0 license.
+
+The full text of the license is found here:
+http://creativecommons.org/licenses/by-sa/3.0/
+
+----
+
+applications-system.svg, media-flash.svg, system-log-out.svg:
+
+Created by artists for the Tango Icon Project.
+
+This work is in the public domain.
+
+----
+
+key.svg, manage.svg, slide-audio.svg:
+
+Part of the RRZE Icon Set, (c) 2010 Regional Computing Centre of Erlangen
+(RRZE).
+
+Get it here: http://rrze-icon-set.berlios.de/download.html
+
+Some rights reserved. This work is licensed under a Creative Commons
+Attribution-ShareAlike 3.0 license.
+
+The full text of the license is found here:
+http://creativecommons.org/licenses/by-sa/3.0/
