@@ -10,6 +10,9 @@
 #include <string.h>
 
 #include <psp2/io/stat.h>
+#include <psp2/ctrl.h>
+#include <psp2/types.h>
+#include <psp2/io/fcntl.h>
 
 #include <psplib/pl_file.h>
 #include <psplib/image.h>

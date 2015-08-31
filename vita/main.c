@@ -11,40 +11,40 @@ int main()
     // set the CPU clock speed to 444MHz
     scePowerIsPowerOnline(444);
 
-	// first, initialize Vita2D
-	printf("Starting Snes9xVITA");
-	vita2d_init();
-	vita2d_set_vblank_wait(false);
+    // first, initialize Vita2D
+    printf("Starting Snes9xVITA");
+    vita2d_init();
+    vita2d_set_vblank_wait(false);
 
-	// do some setup
-	setup_input();
-	setup_callbacks();
-	setup_audio();
-	retro_init();
+    // do some setup
+    setup_input();
+    setup_callbacks();
+    setup_audio();
+    retro_init();
     pl_psp_init("cache0:/Snes9x/");
 
-	// get the game ready
+    // get the game ready
     if (InitMenu())
     {
         DisplayMenu();
         TrashMenu();
     }
 
-	load_rom();
+    load_rom();
 
-	// finally, enter the main loop
-	should_run = true;
+    // finally, enter the main loop
+    should_run = true;
 
-	while(should_run)
-	{
-		retro_run();
-	}
+    while (should_run)
+    {
+        retro_run();
+    }
 
-	// once emulation is complete, shut down and exit
-	vita_cleanup();
+    // once emulation is complete, shut down and exit
+    vita_cleanup();
 
-	sceKernelExitProcess(0);
-	return 0;
+    sceKernelExitProcess(0);
+    return 0;
 }
 
 /***
@@ -52,15 +52,15 @@ int main()
  */
 void setup_callbacks()
 {
-	printf("Setting up libretro callbacks...");
+    printf("Setting up libretro callbacks...");
 
-	retro_set_environment(&retro_environment_callback);
-	retro_set_video_refresh(&retro_video_refresh_callback);
-	retro_set_input_poll(&retro_input_poll_callback);
-	retro_set_input_state(&retro_input_state_callback);
-	retro_set_audio_sample_batch(&retro_audio_sample_batch_callback);
+    retro_set_environment(&retro_environment_callback);
+    retro_set_video_refresh(&retro_video_refresh_callback);
+    retro_set_input_poll(&retro_input_poll_callback);
+    retro_set_input_state(&retro_input_state_callback);
+    retro_set_audio_sample_batch(&retro_audio_sample_batch_callback);
 
-	printf("Libretro callbacks created successfully!");
+    printf("Libretro callbacks created successfully!");
 }
 
 /***
@@ -68,11 +68,11 @@ void setup_callbacks()
  */
 void retro_environment_callback(unsigned cmd, void *data)
 {
-	// TODO: do something with this data...
-	// Also, retro_init() doesn't work if I just
-	// put a return here, hence the stupid printf.
-	if(curr_frame == 0)
-		printf("Inside of retro_environment_callback");
+    // TODO: do something with this data...
+    // Also, retro_init() doesn't work if I just
+    // put a return here, hence the stupid printf.
+    if (curr_frame == 0)
+        printf("Inside of retro_environment_callback");
 }
 
 /***
@@ -80,53 +80,53 @@ void retro_environment_callback(unsigned cmd, void *data)
  */
 void load_rom()
 {
-	// let the user choose a ROM
-	printf("Letting the user choose a ROM");
+    // let the user choose a ROM
+    printf("Letting the user choose a ROM");
 
-	const char *start_path = "cache0:/VitaDefilerClient/Documents";
-	const char *supported_ext[] = { "smc", "fig", "sfc", "gd3", "gd7", 
-									"dx2", "bsx", "swc", 
+    const char *start_path = "cache0:/VitaDefilerClient/Documents";
+    const char *supported_ext[] = { "smc", "fig", "sfc", "gd3", "gd7",
+                                    "dx2", "bsx", "swc",
                                     "SMC", "FIG", "SFC", "GD3", "GD7",
                                     "DX2", "BSX", "SWC", NULL };
 
-	file_choose(start_path, rom_path, "Choose a Super Nintendo / Super Famicom ROM", supported_ext);
+    file_choose(start_path, rom_path, "Choose a Super Nintendo / Super Famicom ROM", supported_ext);
 
-	// load the ROM into the emulator
-	printf("Loading the ROM into the emulator...");
+    // load the ROM into the emulator
+    printf("Loading the ROM into the emulator...");
 
-	struct retro_game_info game;
-	game.path = rom_path;
-	game.meta = NULL;
-	game.data = NULL;
-	game.size = NULL;
+    struct retro_game_info game;
+    game.path = rom_path;
+    game.meta = NULL;
+    game.data = NULL;
+    game.size = NULL;
 
-	retro_load_game(&game);
-	printf("ROM loaded into emulator successfully");
+    retro_load_game(&game);
+    printf("ROM loaded into emulator successfully");
 
-	// if a save file exists for the game, load it up
-	LoadSRAM();
+    // if a save file exists for the game, load it up
+    LoadSRAM();
 
-	// after we've loaded the rom, clear both buffers
-	// since we don't clear buffers between frames
-	// during execution. if we don't, the font
-	// will remain on the screen.
-	// doing less than this resulted in one buffer
-	// retaining the text. will clean up later.
-	vita2d_start_drawing();
-	vita2d_clear_screen();
-	vita2d_end_drawing();
+    // after we've loaded the rom, clear both buffers
+    // since we don't clear buffers between frames
+    // during execution. if we don't, the font
+    // will remain on the screen.
+    // doing less than this resulted in one buffer
+    // retaining the text. will clean up later.
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+    vita2d_end_drawing();
 
-	vita2d_swap_buffers();
+    vita2d_swap_buffers();
 
-	vita2d_start_drawing();
-	vita2d_clear_screen();
-	vita2d_end_drawing();
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+    vita2d_end_drawing();
 
-	vita2d_swap_buffers();
+    vita2d_swap_buffers();
 
-	vita2d_start_drawing();
-	vita2d_clear_screen();
-	vita2d_end_drawing();
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+    vita2d_end_drawing();
 }
 
 /***
@@ -134,11 +134,11 @@ void load_rom()
  */
 void vita_cleanup()
 {
-	
-	free(keymap);
+
+    free(keymap);
     free(pad);
 
-	vita2d_fini();
+    vita2d_fini();
     audio_shutdown();
     video_shutdown();
 }
@@ -148,15 +148,15 @@ void vita_cleanup()
  * with the given extension.
  */
 const char* S9xGetFilename(const char* extension, uint32_t dirtype)
-{ 
-	size_t len = strlen(rom_path);
-	return strcat(strndup(rom_path, len - 3), extension); 
+{
+    size_t len = strlen(rom_path);
+    return strcat(strndup(rom_path, len - 3), extension);
 }
 
 /***
  * Should simply return the folder that the ROM was loaded from.
  */
-const char* S9xGetDirectory(uint32_t dirtype) 
-{ 
-	return strndup(rom_path, strrchr(rom_path, '/') - rom_path + 1);
+const char* S9xGetDirectory(uint32_t dirtype)
+{
+    return strndup(rom_path, strrchr(rom_path, '/') - rom_path + 1);
 }

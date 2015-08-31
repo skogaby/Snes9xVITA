@@ -22,6 +22,7 @@ pl_file_path CurrentGame = "";
 pl_file_path GamePath;
 pl_file_path SaveStatePath;
 pl_file_path ScreenshotPath;
+bool8 mute = false;
 
 static int TabIndex;
 static int ResumeEmulation;
@@ -34,10 +35,10 @@ PL_MENU_OPTIONS_BEGIN(ToggleOptions)
     PL_MENU_OPTION("Enabled",  1)
 PL_MENU_OPTIONS_END
 PL_MENU_OPTIONS_BEGIN(ScreenSizeOptions)
-    PL_MENU_OPTION("Actual size",          DISPLAY_MODE_UNSCALED)
-    PL_MENU_OPTION("4:3 scaled (2x)",  DISPLAY_MODE_2X)
-	PL_MENU_OPTION("4:3 scaled (3x)",  DISPLAY_MODE_3X)
-    PL_MENU_OPTION("4:3 scaled (fit height)",  DISPLAY_MODE_FIT_HEIGHT)
+    PL_MENU_OPTION("Actual size", DISPLAY_MODE_UNSCALED)
+    PL_MENU_OPTION("4:3 scaled (2x)", DISPLAY_MODE_2X)
+	PL_MENU_OPTION("4:3 scaled (3x)", DISPLAY_MODE_3X)
+    PL_MENU_OPTION("4:3 scaled (fit height)", DISPLAY_MODE_FIT_HEIGHT)
     PL_MENU_OPTION("16:9 scaled (fit screen)", DISPLAY_MODE_FILL_SCREEN)
 PL_MENU_OPTIONS_END
 PL_MENU_OPTIONS_BEGIN(FrameLimitOptions)
@@ -396,7 +397,7 @@ void LoadOptions()
     UiMetric.Animate = pl_ini_get_int(&init, "Menu", "Animate", 1);
 
     // TODO: make this control sound emulation
-    // mute = !pl_ini_get_int(&init, "System", "Sound", 1);
+    mute = !pl_ini_get_int(&init, "System", "Sound", 1);
 
     pl_ini_get_string(&init, "File", "Game Path", NULL, GamePath, sizeof(GamePath));
 
@@ -426,7 +427,7 @@ int SaveOptions()
     pl_ini_set_int(&init, "Menu", "Animate", UiMetric.Animate);
 
     // TODO: make this control sound emulation
-    // pl_ini_set_int(&init, "System", "Sound", !mute);
+    pl_ini_set_int(&init, "System", "Sound", !mute);
 
     /* Save INI file */
     int status = pl_ini_save(&init, path);
@@ -493,7 +494,7 @@ void DisplayMenu()
         case TAB_SYSTEM:
             item = pl_menu_find_item_by_id(&SystemUiMenu.Menu, SYSTEM_AUDIO);
             // TODO: make this control sound emulation
-            // pl_menu_select_option_by_value(item, (void*)!mute);
+            pl_menu_select_option_by_value(item, (void*)!mute);
             pspUiOpenMenu(&SystemUiMenu, NULL);
             SaveOptions();
             break;
@@ -799,7 +800,7 @@ int OnMenuItemChanged(const struct PspUiMenu *uimenu, pl_menu_item* item, const 
     else if (uimenu == &SystemUiMenu)
     {
         // TODO: make this control sound emulation
-        // mute = !(int)option->value;
+        mute = !(int)option->value;
     }
     else if (uimenu == &OptionUiMenu)
     {
@@ -923,7 +924,7 @@ static int LoadButtonConfig()
     sprintf(path, "%s%s.cnf", pl_psp_get_app_directory(), ButtonConfigFile);
 
     /* Open file for reading */
-    FILE *file = fopen(path, "r");
+    SceUID file = sceIoOpen(path, PSP2_O_RDONLY, 0777);
     free(path);
 
     /* If no configuration, load defaults */
@@ -934,8 +935,8 @@ static int LoadButtonConfig()
     }
 
     /* Read contents of struct */
-    int nread = fread(&ActiveConfig, sizeof(struct ButtonConfig), 1, file);
-    fclose(file);
+    int nread = sceIoRead(file, &ActiveConfig, sizeof(struct ButtonConfig));
+    sceIoClose(file);
 
     if (nread != 1)
     {
@@ -958,15 +959,15 @@ static int SaveButtonConfig()
     sprintf(path, "%s%s.cnf", pl_psp_get_app_directory(), ButtonConfigFile);
 
     /* Open file for writing */
-    FILE *file = fopen(path, "w");
+    SceUID file = sceIoOpen(path, PSP2_O_WRONLY | PSP2_O_CREAT, 0777);
     free(path);
 
     if (!file) 
         return 0;
 
     /* Write contents of struct */
-    int nwritten = fwrite(&ActiveConfig, sizeof(struct ButtonConfig), 1, file);
-    fclose(file);
+    int nwritten = sceIoWrite(file, &ActiveConfig, sizeof(struct ButtonConfig));
+    sceIoClose(file);
 
     return (nwritten == 1);
 }
@@ -975,14 +976,14 @@ static int SaveButtonConfig()
 PspImage* LoadStateIcon(const char *path)
 {
     /* Open file for reading */
-    FILE *f = fopen(path, "r");
+    SceUID f = sceIoOpen(path, PSP2_O_RDONLY, 0777);
 
     if (!f) 
         return NULL;
 
     /* Load image */
-    PspImage *image = pspImageLoadPngFd(f);
-    fclose(f);
+    PspImage *image = pspImageLoadPngSCE(f);
+    sceIoClose(f);
 
     return image;
 }
