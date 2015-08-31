@@ -19,7 +19,7 @@
 #include "vita_input.h"
 #include "vita_audio.h"
 #include "vita_video.h"
-//#include "vita_menu.h"
+#include "vita_menu.h"
 #include "file_chooser.h"
 #include "../libretro/libretro.h"
 

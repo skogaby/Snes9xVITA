@@ -21,13 +21,14 @@ int main()
 	setup_callbacks();
 	setup_audio();
 	retro_init();
+    pl_psp_init("cache0:/Snes9x/");
 
 	// get the game ready
-    //if (InitMenu())
-    //{
-    //    DisplayMenu();
-    //    TrashMenu();
-    //}
+    if (InitMenu())
+    {
+        DisplayMenu();
+        TrashMenu();
+    }
 
 	load_rom();
 

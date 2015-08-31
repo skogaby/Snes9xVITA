@@ -298,6 +298,7 @@ int InitMenu()
 
     if (!pl_file_exists(SaveStatePath))
         pl_file_mkdir_recursive(SaveStatePath);
+        
 
     /* Initialize options */
     LoadOptions();
@@ -526,7 +527,7 @@ void OnSplashRender(const void *splash, const void *null)
 
     const char *lines[] =
     {
-        APP_NAME" version "APP_VER" ("__DATE__")",
+        PSP_APP_NAME" version "PSP_APP_VER" ("__DATE__")",
         "\026https://github.com/skogaby/Snes9xVITA",
         " ",
         "2015 skogaby",

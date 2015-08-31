@@ -1,4 +1,4 @@
-TARGET = snes9x_next_vita
+TARGET = Snes9xVITA
 OBJS = src/apu.o src/bsx.o src/c4emu.o src/cheats.o src/controls.o src/cpu.o src/cpuexec.o \
 	   src/dsp.o src/fxemu.o src/globals.o src/memmap.o src/obc1.o src/ppu.o src/sa1.o \
 	   src/sdd1.o src/seta.o src/snapshot.o src/spc7110.o src/srtc.o src/tile.o \
