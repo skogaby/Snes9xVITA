@@ -25,6 +25,7 @@
 #include <psplib/video.h>
 
 #include "../src/snes9x.h"
+#include "../libretro/libretro.h"
 
 #define PSP_APP_NAME "Snes9xVITA"
 #define PSP_APP_VER  "1.0.0 beta"
@@ -48,13 +49,13 @@
 
 #define SYSTEM_SCRNSHOT     1
 #define SYSTEM_RESET        2
-#define SYSTEM_AUDIO				3
+#define SYSTEM_AUDIO		3
 
 #define DISPLAY_MODE_UNSCALED    0
-#define DISPLAY_MODE_FIT_HEIGHT  1
-#define DISPLAY_MODE_FILL_SCREEN 2
-#define DISPLAY_MODE_2X 3
-#define DISPLAY_MODE_3X 4
+#define DISPLAY_MODE_2X 1
+#define DISPLAY_MODE_3X 2
+#define DISPLAY_MODE_FIT_HEIGHT  3
+#define DISPLAY_MODE_FILL_SCREEN 4
 
 #define JOY 0x1000
 #define SPC 0x2000
@@ -83,6 +84,17 @@
 #define MAP_BUTTON_START       15
 #define MAP_BUTTON_LRTRIGGERS  16
 #define MAP_BUTTON_STARTSELECT 17
+
+typedef struct
+{
+    int   ShowFps;
+    int   VSync;
+    int   ControlMode;
+    int   ClockFreq;
+    int   DisplayMode;
+    int   UpdateFreq;
+    int   Frameskip;
+} EmulatorOptions;
 
 struct ButtonConfig
 {

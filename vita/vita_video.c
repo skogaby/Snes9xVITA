@@ -11,7 +11,6 @@ int pos_x, pos_y;
 unsigned short h, w;
 vita2d_texture *tex;
 void *tex_data;
-PspImage *Screen;
 
 /***
  * Callback for when a new frame is generated that we need to render.

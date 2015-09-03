@@ -17,12 +17,13 @@ static const char PresentSlotText[] = "\026\244\020 Save\t\026\001\020 Load\t\02
 static const char EmptySlotText[] = "\026\244\020 Save";
 
 char *GameName;
+EmulatorOptions Options;
 
 pl_file_path CurrentGame = "";
 pl_file_path GamePath;
 pl_file_path SaveStatePath;
 pl_file_path ScreenshotPath;
-bool8 mute = false;
+unsigned char mute = 0;
 
 static int TabIndex;
 static int ResumeEmulation;
@@ -318,7 +319,7 @@ int InitMenu()
     pspImageClear(NoSaveIcon, RGB(0x01, 0x33, 0x24));
 
     /* Initialize state menu */
-    //  SaveStateGallery.Menu = pl_menu_create();
+    // SaveStateGallery.Menu = pl_menu_create();
     int i;
     pl_menu_item *item;
 
@@ -347,8 +348,8 @@ int InitMenu()
     UiMetric.Top = 48;
     UiMetric.Right = 944;
     UiMetric.Bottom = 500;
-    UiMetric.OkButton = (!Settings.ControlMode) ? PSP_CTRL_CROSS : PSP_CTRL_CIRCLE;
-    UiMetric.CancelButton = (!Settings.ControlMode) ? PSP_CTRL_CIRCLE : PSP_CTRL_CROSS;
+    UiMetric.OkButton = (!Options.ControlMode) ? PSP_CTRL_CROSS : PSP_CTRL_CIRCLE;
+    UiMetric.CancelButton = (!Options.ControlMode) ? PSP_CTRL_CIRCLE : PSP_CTRL_CROSS;
     UiMetric.ScrollbarColor = PSP_COLOR_GRAY;
     UiMetric.ScrollbarBgColor = 0x44ffffff;
     UiMetric.ScrollbarWidth = 10;
@@ -386,14 +387,14 @@ void LoadOptions()
     pl_ini_load(&init, path);
 
     /* Load values */
-    Settings.DisplayMode = pl_ini_get_int(&init, "Video", "Display Mode", DISPLAY_MODE_UNSCALED);
-    Settings.UpdateFreq = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
-    Settings.Frameskip = pl_ini_get_int(&init, "Video", "Frameskip", 1);
-    Settings.VSync = pl_ini_get_int(&init, "Video", "VSync", 1);
-    Settings.ClockFreq = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
-    Settings.ShowFps = pl_ini_get_int(&init, "Video", "Show FPS", 0);
+    Options.DisplayMode = pl_ini_get_int(&init, "Video", "Display Mode", DISPLAY_MODE_UNSCALED);
+    Options.UpdateFreq = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
+    Options.Frameskip = pl_ini_get_int(&init, "Video", "Frameskip", 1);
+    Options.VSync = pl_ini_get_int(&init, "Video", "VSync", 1);
+    Options.ClockFreq = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
+    Options.ShowFps = pl_ini_get_int(&init, "Video", "Show FPS", 0);
 
-    Settings.ControlMode = pl_ini_get_int(&init, "Menu", "Control Mode", 0);
+    Options.ControlMode = pl_ini_get_int(&init, "Menu", "Control Mode", 0);
     UiMetric.Animate = pl_ini_get_int(&init, "Menu", "Animate", 1);
 
     // TODO: make this control sound emulation
@@ -416,14 +417,14 @@ int SaveOptions()
     pl_ini_create(&init);
 
     /* Set values */
-    pl_ini_set_int(&init, "Video", "Display Mode", Settings.DisplayMode);
-    pl_ini_set_int(&init, "Video", "Update Frequency", Settings.UpdateFreq);
-    pl_ini_set_int(&init, "Video", "Frameskip", Settings.Frameskip);
-    pl_ini_set_int(&init, "Video", "VSync", Settings.VSync);
-    pl_ini_set_int(&init, "Video", "PSP Clock Frequency", Settings.ClockFreq);
-    pl_ini_set_int(&init, "Video", "Show FPS", Settings.ShowFps);
+    pl_ini_set_int(&init, "Video", "Display Mode", Options.DisplayMode);
+    pl_ini_set_int(&init, "Video", "Update Frequency", Options.UpdateFreq);
+    pl_ini_set_int(&init, "Video", "Frameskip", Options.Frameskip);
+    pl_ini_set_int(&init, "Video", "VSync", Options.VSync);
+    pl_ini_set_int(&init, "Video", "PSP Clock Frequency", Options.ClockFreq);
+    pl_ini_set_int(&init, "Video", "Show FPS", Options.ShowFps);
 
-    pl_ini_set_int(&init, "Menu", "Control Mode", Settings.ControlMode);
+    pl_ini_set_int(&init, "Menu", "Control Mode", Options.ControlMode);
     pl_ini_set_int(&init, "Menu", "Animate", UiMetric.Animate);
 
     // TODO: make this control sound emulation
@@ -449,7 +450,7 @@ void DisplayMenu()
         ResumeEmulation = 0;
 
         /* Set normal clock frequency */
-        pl_psp_set_clock_freq(333);
+        //pl_psp_set_clock_freq(333);
         /* Set buttons to autorepeat */
         pspCtrlSetPollingMode(PSP_CTRL_AUTOREPEAT);
 
@@ -471,21 +472,21 @@ void DisplayMenu()
         case TAB_OPTION:
             /* Init menu options */
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_DISPLAY_MODE);
-            pl_menu_select_option_by_value(item, (void*)Settings.DisplayMode);
+            pl_menu_select_option_by_value(item, (void*)Options.DisplayMode);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_SYNC_FREQ);
-            pl_menu_select_option_by_value(item, (void*)Settings.UpdateFreq);
+            pl_menu_select_option_by_value(item, (void*)Options.UpdateFreq);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_FRAMESKIP);
-            pl_menu_select_option_by_value(item, (void*)(int)Settings.Frameskip);
+            pl_menu_select_option_by_value(item, (void*)Options.Frameskip);
 
             if ((item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_VSYNC)))
-                pl_menu_select_option_by_value(item, (void*)Settings.VSync);
+                pl_menu_select_option_by_value(item, (void*)Options.VSync);
 
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_CLOCK_FREQ);
-            pl_menu_select_option_by_value(item, (void*)Settings.ClockFreq);
+            pl_menu_select_option_by_value(item, (void*)Options.ClockFreq);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_SHOW_FPS);
-            pl_menu_select_option_by_value(item, (void*)Settings.ShowFps);
+            pl_menu_select_option_by_value(item, (void*)Options.ShowFps);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_CONTROL_MODE);
-            pl_menu_select_option_by_value(item, (void*)Settings.ControlMode);
+            pl_menu_select_option_by_value(item, (void*)Options.ControlMode);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_ANIMATE);
             pl_menu_select_option_by_value(item, (void*)UiMetric.Animate);
             pspUiOpenMenu(&OptionUiMenu, NULL);
@@ -506,7 +507,7 @@ void DisplayMenu()
         if (!ExitPSP)
         {
             /* Set clock frequency during emulation */
-            pl_psp_set_clock_freq(Settings.ClockFreq);
+            //pl_psp_set_clock_freq(Options.ClockFreq);
             /* Set buttons to normal mode */
             pspCtrlSetPollingMode(PSP_CTRL_NORMAL);
 
@@ -514,8 +515,7 @@ void DisplayMenu()
             if (ResumeEmulation)
             {
                 if (UiMetric.Animate) pspUiFadeout();
-                // TODO: run the emulator
-                // RunEmulation();
+                retro_run();
                 if (UiMetric.Animate) pspUiFadeout();
             }
         }
@@ -653,16 +653,16 @@ int OnQuickloadOk(const void *browser, const void *path)
     GameName = strdup(path);
     pspUiFlashMessage("Loading, please wait...");
 
-    // TODO: load the ROM
-    if (false) // !system_load_rom((char*)path))
-    {
-        pspUiAlert("Error loading cartridge");
-        return 0;
-    }
+    struct retro_game_info game;
+    game.path = GameName;
+    game.meta = NULL;
+    game.data = NULL;
+    game.size = NULL;
+
+    retro_load_game(&game);
+    LoadSRAM();
 
     pl_file_get_parent_directory((const char*)path, GamePath, sizeof(GamePath));
-    // TODO: reset the emulator
-    // reset();
     ResumeEmulation = 1;
 
     return 1;
@@ -809,25 +809,25 @@ int OnMenuItemChanged(const struct PspUiMenu *uimenu, pl_menu_item* item, const 
         switch (item->id)
         {
         case OPTION_DISPLAY_MODE:
-            Settings.DisplayMode = value; 
+            Options.DisplayMode = value;
             break;
         case OPTION_SYNC_FREQ:
-            Settings.UpdateFreq = value; 
+            Options.UpdateFreq = value;
             break;
         case OPTION_FRAMESKIP:
-            Settings.Frameskip = value; 
+            Options.Frameskip = value;
             break;
         case OPTION_VSYNC:
-            Settings.VSync = value; 
+            Options.VSync = value;
             break;
         case OPTION_CLOCK_FREQ:
-            Settings.ClockFreq = value; 
+            Options.ClockFreq = value;
             break;
         case OPTION_SHOW_FPS:
-            Settings.ShowFps = value; 
+            Options.ShowFps = value;
             break;
         case OPTION_CONTROL_MODE:
-            Settings.ControlMode = value;
+            Options.ControlMode = value;
             UiMetric.OkButton = (!value) ? PSP_CTRL_CROSS : PSP_CTRL_CIRCLE;
             UiMetric.CancelButton = (!value) ? PSP_CTRL_CIRCLE : PSP_CTRL_CROSS;
             break;
@@ -862,9 +862,8 @@ int OnMenuOk(const void *uimenu, const void* sel_item)
             if (pspUiConfirm("Reset the system?"))
             {
                 ResumeEmulation = 1;
-                
-                // TODO: reset the console
-                // reset();
+                S9xReset();
+
                 return 1;
             }
             break;
@@ -885,6 +884,8 @@ int OnMenuOk(const void *uimenu, const void* sel_item)
 
 int OnMenuButtonPress(const struct PspUiMenu *uimenu, pl_menu_item* sel_item, uint32_t button_mask)
 {
+    printf("Inside OnMenuButtonPress");
+
     if (uimenu == &ControlUiMenu)
     {
         if (button_mask & PSP_CTRL_TRIANGLE)
@@ -903,6 +904,7 @@ int OnMenuButtonPress(const struct PspUiMenu *uimenu, pl_menu_item* sel_item, ui
         }
     }
 
+    printf("Returning from OnMenuButtonPress");
     return OnGenericButtonPress(NULL, NULL, button_mask);
 }
 
@@ -1069,13 +1071,8 @@ void TrashMenu()
     /* Unload ROM */
     if (GameName)
     {
-        // TODO: unload the ROM from the emulator
-        // system_unload_rom();
         free(GameName);
     }
-
-    // TODO: Free emulation-specific resources
-    // TrashEmulation();
 
     /* Save options */
     SaveOptions();

@@ -396,15 +396,6 @@ struct SSettings
 	float   SuperFXSpeedPerLine;
 
 	int32	AutoSaveDelay;
-
-    // adding some more settings to be user configurable
-    bool8 ShowFps;
-    bool8 VSync;
-    int   ControlMode;
-    int   ClockFreq;
-    int   DisplayMode;
-    int   UpdateFreq;
-    int   Frameskip;
 };
 
 struct SSNESGameFixes

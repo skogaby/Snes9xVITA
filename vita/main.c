@@ -3,6 +3,8 @@
 
 #include "main.h"
 
+PspImage *Screen;
+
 /***
  * Main entrypoint of the emulator
  */
@@ -16,11 +18,13 @@ int main()
     vita2d_init();
     vita2d_set_vblank_wait(false);
 
+    // TODO
+    Screen = pspImageCreateVram(256, 256, GU_PSM_4444);
+
     // do some setup
     setup_input();
     setup_callbacks();
     setup_audio();
-    retro_init();
     pl_psp_init("cache0:/Snes9x/");
 
     // get the game ready
@@ -30,15 +34,15 @@ int main()
         TrashMenu();
     }
 
-    load_rom();
+    //load_rom();
 
-    // finally, enter the main loop
-    should_run = true;
+    //// finally, enter the main loop
+    //should_run = true;
 
-    while (should_run)
-    {
-        retro_run();
-    }
+    //while (should_run)
+    //{
+    //    retro_run();
+    //}
 
     // once emulation is complete, shut down and exit
     vita_cleanup();
