@@ -17,7 +17,7 @@ static const char ControlHelpText[] = "\026\250\020 Change mapping\t\026\001\020
 static const char PresentSlotText[] = "\026\244\020 Save\t\026\001\020 Load\t\026\243\020 Delete";
 static const char EmptySlotText[] = "\026\244\020 Save";
 
-char *GameName;
+char GameName[PATH_MAX];
 EmulatorOptions Options;
 
 pl_file_path CurrentGame = "";
@@ -293,7 +293,8 @@ int InitMenu()
     /* Reset variables */
     TabIndex = TAB_ABOUT;
     Background = NULL;
-    GameName = NULL;
+    // GameName = NULL;
+    GameName[0] = '\0';
 
     /* Initialize paths */
     sprintf(SaveStatePath, "%ssavedata/", pl_psp_get_app_directory());
@@ -459,7 +460,7 @@ void DisplayMenu()
         switch (TabIndex)
         {
         case TAB_QUICKLOAD:
-            pspUiOpenBrowser(&QuickloadBrowser, (GameName) ? GameName : GamePath);
+            pspUiOpenBrowser(&QuickloadBrowser, strlen(GameName) != 0 ? GameName : GamePath);
             break;
         case TAB_STATE:
             DisplayStateTab();
@@ -563,7 +564,7 @@ void OnGenericRender(const void *uiobject, const void *item_obj)
     {
         width = -10;
 
-        if (!GameName && (i == TAB_STATE || i == TAB_SYSTEM))
+        if (strlen(GameName) == 0 && (i == TAB_STATE || i == TAB_SYSTEM))
             continue;
 
         /* Determine width of text */
@@ -591,7 +592,7 @@ int OnGenericButtonPress(const PspUiFileBrowser *browser, const char *path, uint
         {
             tab_index = TabIndex;
 
-            if (!GameName && (TabIndex == TAB_STATE || TabIndex == TAB_SYSTEM)) 
+            if (strlen(GameName) == 0 && (TabIndex == TAB_STATE || TabIndex == TAB_SYSTEM))
                 TabIndex--;
 
             if (TabIndex < 0) 
@@ -606,7 +607,7 @@ int OnGenericButtonPress(const PspUiFileBrowser *browser, const char *path, uint
         {
             tab_index = TabIndex;
 
-            if (!GameName && (TabIndex == TAB_STATE || TabIndex == TAB_SYSTEM)) 
+            if (strlen(GameName) == 0 && (TabIndex == TAB_STATE || TabIndex == TAB_SYSTEM))
                 TabIndex++;
 
             if (TabIndex > TAB_MAX) 
@@ -630,7 +631,7 @@ int OnGenericButtonPress(const PspUiFileBrowser *browser, const char *path, uint
 
 int OnGenericCancel(const void *uiobject, const void* param)
 {
-    if (GameName) 
+    if (strlen(GameName) != 0)
         ResumeEmulation = 1;
 
     return 1;
@@ -638,14 +639,7 @@ int OnGenericCancel(const void *uiobject, const void* param)
 
 int OnQuickloadOk(const void *browser, const void *path)
 {
-    if (GameName)
-    {
-        // TODO: unload the ROM
-        // system_unload_rom();
-        free(GameName);
-    }
-
-    GameName = strdup(path);
+    sprintf(GameName, "%s", path);
     pspUiFlashMessage("Loading, please wait...");
 
     struct retro_game_info game;
@@ -665,7 +659,7 @@ int OnQuickloadOk(const void *browser, const void *path)
 
 int OnSaveStateOk(const void *gallery, const void *item)
 {
-    if (!GameName) 
+    if (strlen(GameName) == 0) 
     { 
         TabIndex++; 
         return 0; 
@@ -698,7 +692,7 @@ int OnSaveStateOk(const void *gallery, const void *item)
 
 int OnSaveStateButtonPress(const PspUiGallery *gallery, pl_menu_item *sel, uint32_t button_mask)
 {
-    if (!GameName) 
+    if (strlen(GameName) == 0)
     { 
         TabIndex++; 
         return 0; 
@@ -984,7 +978,7 @@ PspImage* LoadStateIcon(const char *path)
 
 static void DisplayStateTab()
 {
-    if (!GameName) 
+    if (strlen(GameName) == 0)
     { 
         TabIndex++; 
         return; 
@@ -1060,12 +1054,6 @@ void OnSystemRender(const void *uiobject, const void *item_obj)
 
 void TrashMenu()
 {
-    /* Unload ROM */
-    if (GameName)
-    {
-        free(GameName);
-    }
-
     /* Save options */
     SaveOptions();
 
@@ -1085,8 +1073,12 @@ void TrashMenu()
 */
 const char* S9xGetFilename(const char* extension, uint32_t dirtype)
 {
+    char* path = (char*)malloc(PATH_MAX);
     size_t len = strlen(GameName);
-    return strcat(strndup(GameName, len - 3), extension);
+
+    // copy the first part of the ROM name
+    strncpy(path, GameName, len - 4);
+    return strcat(path, extension);
 }
 
 /***
@@ -1094,7 +1086,9 @@ const char* S9xGetFilename(const char* extension, uint32_t dirtype)
 */
 const char* S9xGetDirectory(uint32_t dirtype)
 {
-    return strndup(GameName, strrchr(GameName, '/') - GameName + 1);
+    char* path = (char*)malloc(PATH_MAX);
+
+    strncpy(path, GameName, strrchr(GameName, '/') - GameName + 1);
 }
 
 

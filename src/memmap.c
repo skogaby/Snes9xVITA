@@ -1284,96 +1284,95 @@ static bool8 SaveSRTC (void)
 	return (TRUE);
 }
 
-bool8 LoadSRAM ()
+bool8 LoadSRAM()
 {
-	SceUID file;
-	int	size, len;
-	const char* filename = S9xGetFilename(".srm", 0);
-    printf("LoadSRAM: %s", filename);
+    SceUID file;
+    int	size, len;
 
-	/* Clear SRAM */
-	memset(Memory.SRAM, SNESGameFixes.SRAMInitialValue, 0x20000);
+    const char* sramName = S9xGetFilename(".srm", 0);
 
-	if (Multi.cartType && Multi.sramSizeB)
-	{
-		char temp[PATH_MAX + 1];
+    /* Clear SRAM */
+    memset(Memory.SRAM, SNESGameFixes.SRAMInitialValue, 0x20000);
 
-		strcpy(temp, Memory.ROMFilename);
-		strcpy(Memory.ROMFilename, Multi.fileNameB);
+    if (Multi.cartType && Multi.sramSizeB)
+    {
+        char temp[PATH_MAX + 1];
 
-		size = (1 << (Multi.sramSizeB + 3)) * 128;
-		file = sceIoOpen(filename, PSP2_O_RDONLY, 0777);
+        strcpy(temp, Memory.ROMFilename);
+        strcpy(Memory.ROMFilename, Multi.fileNameB);
 
-		if (file)
-		{
-			len = sceIoRead(file, Multi.sramB, 0x10000);
-			sceIoClose(file);
+        size = (1 << (Multi.sramSizeB + 3)) * 128;
+        file = sceIoOpen(sramName, PSP2_O_RDONLY, 0777);
 
-			if (len - size == 512)
-				memmove(Multi.sramB, Multi.sramB + 512, size);
-		}
+        if (file)
+        {
+            len = sceIoRead(file, Multi.sramB, 0x10000);
+            sceIoClose(file);
 
-		strcpy(Memory.ROMFilename, temp);
-	}
+            if (len - size == 512)
+                memmove(Multi.sramB, Multi.sramB + 512, size);
+        }
 
-	size = Memory.SRAMSize ? (1 << (Memory.SRAMSize + 3)) * 128 : 0;
-	if (size > 0x20000)
-		size = 0x20000;
+        strcpy(Memory.ROMFilename, temp);
+    }
 
-	if (size)
-	{
-		file = sceIoOpen(filename, PSP2_O_RDONLY, 0777);
-        free(filename);
+    size = Memory.SRAMSize ? (1 << (Memory.SRAMSize + 3)) * 128 : 0;
+    if (size > 0x20000)
+        size = 0x20000;
 
-		if (file)
-		{
-			len = sceIoRead(file, Memory.SRAM, 0x20000);
-            printf("LoadSRAM len: %i", len);
-			sceIoClose(file);
+    if (size)
+    {
+        file = sceIoOpen(sramName, PSP2_O_RDONLY, 0777);
+        free(sramName);
 
-			if (len - size == 512)
-				memmove(Memory.SRAM, Memory.SRAM + 512, size);
+        if (file)
+        {
+            len = sceIoRead(file, Memory.SRAM, 0x20000);
+            sceIoClose(file);
 
-			if (Settings.SRTC || Settings.SPC7110RTC)
-				LoadSRTC();
+            if (len - size == 512)
+                memmove(Memory.SRAM, Memory.SRAM + 512, size);
 
-			return (TRUE);
-		}
-		else if (Settings.BS && !Settings.BSXItself)
-		{
-			/* The BS game's SRAM was not found
-			Try to read BS-X.srm instead */
-			char path[PATH_MAX + 1];
+            if (Settings.SRTC || Settings.SPC7110RTC)
+                LoadSRTC();
 
-			char* _dir = S9xGetDirectory(SRAM_DIR);
-			strcpy(path, _dir);
-			strcat(path, SLASH_STR);
-			strcat(path, "BS-X.srm");
-			free(_dir);
+            return (TRUE);
+        }
+        else if (Settings.BS && !Settings.BSXItself)
+        {
+            /* The BS game's SRAM was not found
+            Try to read BS-X.srm instead */
+            char path[PATH_MAX + 1];
 
-			file = sceIoOpen(path, PSP2_O_RDONLY, 0777);
+            char* _dir = S9xGetDirectory(SRAM_DIR);
+            strcpy(path, _dir);
+            strcat(path, SLASH_STR);
+            strcat(path, "BS-X.srm");
+            free(_dir);
 
-			if (file)
-			{
-				len = sceIoRead(file, Memory.SRAM, 0x20000);
-				sceIoClose(file);
+            file = sceIoOpen(path, PSP2_O_RDONLY, 0777);
 
-				if (len - size == 512)
-					memmove(Memory.SRAM, Memory.SRAM + 512, size);
+            if (file)
+            {
+                len = sceIoRead(file, Memory.SRAM, 0x20000);
+                sceIoClose(file);
 
-				S9xMessage(S9X_INFO, S9X_ROM_INFO, "The SRAM file wasn't found: BS-X.srm was read instead.");
-				return (TRUE);
-			}
+                if (len - size == 512)
+                    memmove(Memory.SRAM, Memory.SRAM + 512, size);
 
-			S9xMessage(S9X_INFO, S9X_ROM_INFO, "The SRAM file wasn't found, BS-X.srm wasn't found either.");
-			return (FALSE);
-		}
+                S9xMessage(S9X_INFO, S9X_ROM_INFO, "The SRAM file wasn't found: BS-X.srm was read instead.");
+                return (TRUE);
+            }
 
-		return (FALSE);
-	}
+            S9xMessage(S9X_INFO, S9X_ROM_INFO, "The SRAM file wasn't found, BS-X.srm wasn't found either.");
+            return (FALSE);
+        }
 
-    free(filename);
-	return (TRUE);
+        return (FALSE);
+    }
+
+    free(sramName);
+    return (TRUE);
 }
 
 bool8 SaveSRAM ()

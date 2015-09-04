@@ -71,60 +71,6 @@ int retro_environment_callback(unsigned cmd, void *data)
 }
 
 /***
- * Utility function to load up the ROM using the libretro API.
- */
-void load_rom()
-{
-    // let the user choose a ROM
-    printf("Letting the user choose a ROM");
-
-    const char *start_path = "cache0:/VitaDefilerClient/Documents";
-    const char *supported_ext[] = { "smc", "fig", "sfc", "gd3", "gd7",
-                                    "dx2", "bsx", "swc",
-                                    "SMC", "FIG", "SFC", "GD3", "GD7",
-                                    "DX2", "BSX", "SWC", NULL };
-
-    file_choose(start_path, rom_path, "Choose a Super Nintendo / Super Famicom ROM", supported_ext);
-
-    // load the ROM into the emulator
-    printf("Loading the ROM into the emulator...");
-
-    struct retro_game_info game;
-    game.path = rom_path;
-    game.meta = NULL;
-    game.data = NULL;
-    game.size = NULL;
-
-    retro_load_game(&game);
-    printf("ROM loaded into emulator successfully");
-
-    // if a save file exists for the game, load it up
-    LoadSRAM();
-
-    // after we've loaded the rom, clear both buffers
-    // since we don't clear buffers between frames
-    // during execution. if we don't, the font
-    // will remain on the screen.
-    // doing less than this resulted in one buffer
-    // retaining the text. will clean up later.
-    vita2d_start_drawing();
-    vita2d_clear_screen();
-    vita2d_end_drawing();
-
-    vita2d_swap_buffers();
-
-    vita2d_start_drawing();
-    vita2d_clear_screen();
-    vita2d_end_drawing();
-
-    vita2d_swap_buffers();
-
-    vita2d_start_drawing();
-    vita2d_clear_screen();
-    vita2d_end_drawing();
-}
-
-/***
  * Cleans up the long-lived memory we've allocated.
  */
 void vita_cleanup()
