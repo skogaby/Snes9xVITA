@@ -15,7 +15,7 @@ int main()
 
     // first, initialize Vita2D
     printf("Starting Snes9xVITA");
-    vita2d_init();
+    vita2d_init_advanced(8*1024*1024);
     vita2d_set_vblank_wait(false);
 
     // TODO
@@ -70,13 +70,14 @@ void setup_callbacks()
 /***
  * Callback for updating the libretro environment.
  */
-void retro_environment_callback(unsigned cmd, void *data)
+int retro_environment_callback(unsigned cmd, void *data)
 {
     // TODO: do something with this data...
     // Also, retro_init() doesn't work if I just
     // put a return here, hence the stupid printf.
     if (curr_frame == 0)
         printf("Inside of retro_environment_callback");
+    return 0;
 }
 
 /***

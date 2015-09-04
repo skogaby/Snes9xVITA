@@ -37,7 +37,7 @@ void vita_cleanup();
 void setup_callbacks();
 
 // our collection of callbacks to plug in to libretro
-void retro_environment_callback(unsigned cmd, void *data);
+int retro_environment_callback(unsigned cmd, void *data);
 
 // needed for loading cheats and save files
 char rom_path[PATH_MAX];
