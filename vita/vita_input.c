@@ -54,7 +54,7 @@ void retro_input_poll_callback()
 	if(keymap[RETRO_DEVICE_ID_JOYPAD_X] && keymap[RETRO_DEVICE_ID_JOYPAD_UP] && 
 		keymap[RETRO_DEVICE_ID_JOYPAD_L] && keymap[RETRO_DEVICE_ID_JOYPAD_R])
 	{
-		load_rom();
+        ResumeEmulation = 0;
 	}
 }
 

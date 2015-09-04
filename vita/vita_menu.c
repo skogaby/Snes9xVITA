@@ -5,6 +5,7 @@
 #include "vita_menu.h"
 
 extern PspImage *Screen;
+extern int ResumeEmulation;
 
 static const char *QuickloadFilter[] = { "SMC", "FIG", "SFC", "GD3", "GD7", "DX2", "BSX", "SWC", NULL };
 static const char *ScreenshotDir = "screens";
@@ -26,7 +27,6 @@ pl_file_path ScreenshotPath;
 unsigned char mute = 0;
 
 static int TabIndex;
-static int ResumeEmulation;
 static PspImage *Background;
 static PspImage *NoSaveIcon;
 
@@ -154,6 +154,8 @@ static int OnMenuOk(const void *uimenu, const void* sel_item);
 static int OnMenuButtonPress(const struct PspUiMenu *uimenu, pl_menu_item* sel_item, uint32_t button_mask);
 
 void OnSystemRender(const void *uiobject, const void *item_obj);
+
+void clear_screen();
 
 PspUiSplash SplashScreen =
 {
@@ -305,9 +307,8 @@ int InitMenu()
     /* Initialize options */
     LoadOptions();
 
-    ///* Initialize emulation engine */
-    //if (!InitEmulation())
-    //    return 0;
+    /* Initialize emulation engine */
+    retro_init();
 
     /* Load the background image */
     pl_file_path background;
@@ -506,17 +507,11 @@ void DisplayMenu()
 
         if (!ExitPSP)
         {
-            /* Set clock frequency during emulation */
-            //pl_psp_set_clock_freq(Options.ClockFreq);
-            /* Set buttons to normal mode */
-            pspCtrlSetPollingMode(PSP_CTRL_NORMAL);
+            clear_screen();
 
-            /* Resume emulation */
-            if (ResumeEmulation)
-            {
-                if (UiMetric.Animate) pspUiFadeout();
+            while(ResumeEmulation)
+            { 
                 retro_run();
-                if (UiMetric.Animate) pspUiFadeout();
             }
         }
     } while (!ExitPSP);
@@ -533,7 +528,7 @@ void OnSplashRender(const void *splash, const void *null)
         " ",
         "2015 skogaby",
         "Based on Snes9xNext",
-        "https://github.com/libretro/snes9x-next",
+        "\026https://github.com/libretro/snes9x-next",
         NULL
     };
 
@@ -884,8 +879,6 @@ int OnMenuOk(const void *uimenu, const void* sel_item)
 
 int OnMenuButtonPress(const struct PspUiMenu *uimenu, pl_menu_item* sel_item, uint32_t button_mask)
 {
-    printf("Inside OnMenuButtonPress");
-
     if (uimenu == &ControlUiMenu)
     {
         if (button_mask & PSP_CTRL_TRIANGLE)
@@ -904,7 +897,6 @@ int OnMenuButtonPress(const struct PspUiMenu *uimenu, pl_menu_item* sel_item, ui
         }
     }
 
-    printf("Returning from OnMenuButtonPress");
     return OnGenericButtonPress(NULL, NULL, button_mask);
 }
 
@@ -1085,4 +1077,42 @@ void TrashMenu()
     pl_menu_destroy(&SaveStateGallery.Menu);
     pl_menu_destroy(&OptionUiMenu.Menu);
     pl_menu_destroy(&SystemUiMenu.Menu);
+}
+
+/***
+* Should simply return the filepath of the ROM, but replacing its file extension
+* with the given extension.
+*/
+const char* S9xGetFilename(const char* extension, uint32_t dirtype)
+{
+    size_t len = strlen(GameName);
+    return strcat(strndup(GameName, len - 3), extension);
+}
+
+/***
+* Should simply return the folder that the ROM was loaded from.
+*/
+const char* S9xGetDirectory(uint32_t dirtype)
+{
+    return strndup(GameName, strrchr(GameName, '/') - GameName + 1);
+}
+
+
+void clear_screen()
+{
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+    vita2d_end_drawing();
+
+    vita2d_swap_buffers();
+
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+    vita2d_end_drawing();
+
+    vita2d_swap_buffers();
+
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+    vita2d_end_drawing();
 }

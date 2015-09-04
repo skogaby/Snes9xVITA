@@ -25,7 +25,7 @@
 
 PSP2_MODULE_INFO(0, 0, "Snes9xVITA");
 
-bool should_run;
+int ResumeEmulation;
 
 // utility functions that the core requires us to implement
 const char* S9xGetFilename(const char* extension, uint32_t dirtype);

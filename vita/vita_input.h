@@ -16,6 +16,7 @@
 // helpers for input
 SceCtrlData *pad;
 uint32_t *keymap;
+extern int ResumeEmulation;
 
 void setup_input();
 void retro_input_poll_callback();

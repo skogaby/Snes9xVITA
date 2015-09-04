@@ -1288,11 +1288,8 @@ bool8 LoadSRAM ()
 {
 	SceUID file;
 	int	size, len;
-	char sramName[PATH_MAX + 1];
-
 	const char* filename = S9xGetFilename(".srm", 0);
-	strcpy(sramName, filename);
-	free(filename);
+    printf("LoadSRAM: %s", filename);
 
 	/* Clear SRAM */
 	memset(Memory.SRAM, SNESGameFixes.SRAMInitialValue, 0x20000);
@@ -1305,7 +1302,7 @@ bool8 LoadSRAM ()
 		strcpy(Memory.ROMFilename, Multi.fileNameB);
 
 		size = (1 << (Multi.sramSizeB + 3)) * 128;
-		file = sceIoOpen(sramName, PSP2_O_RDONLY, 0777);
+		file = sceIoOpen(filename, PSP2_O_RDONLY, 0777);
 
 		if (file)
 		{
@@ -1325,11 +1322,13 @@ bool8 LoadSRAM ()
 
 	if (size)
 	{
-		file = sceIoOpen(sramName, PSP2_O_RDONLY, 0777);
+		file = sceIoOpen(filename, PSP2_O_RDONLY, 0777);
+        free(filename);
 
 		if (file)
 		{
 			len = sceIoRead(file, Memory.SRAM, 0x20000);
+            printf("LoadSRAM len: %i", len);
 			sceIoClose(file);
 
 			if (len - size == 512)
@@ -1373,6 +1372,7 @@ bool8 LoadSRAM ()
 		return (FALSE);
 	}
 
+    free(filename);
 	return (TRUE);
 }
 

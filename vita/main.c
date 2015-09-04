@@ -10,21 +10,20 @@ PspImage *Screen;
  */
 int main()
 {
+    // TODO: use the correct function once I'm on vita-toolchain
     // set the CPU clock speed to 444MHz
     scePowerIsPowerOnline(444);
 
     // first, initialize Vita2D
     printf("Starting Snes9xVITA");
-    vita2d_init_advanced(8*1024*1024);
+    vita2d_init_advanced(8 * 1024 * 1024);
     vita2d_set_vblank_wait(false);
-
-    // TODO
-    Screen = pspImageCreateVram(256, 256, GU_PSM_4444);
 
     // do some setup
     setup_input();
     setup_callbacks();
     setup_audio();
+
     pl_psp_init("cache0:/Snes9x/");
 
     // get the game ready
@@ -33,16 +32,6 @@ int main()
         DisplayMenu();
         TrashMenu();
     }
-
-    //load_rom();
-
-    //// finally, enter the main loop
-    //should_run = true;
-
-    //while (should_run)
-    //{
-    //    retro_run();
-    //}
 
     // once emulation is complete, shut down and exit
     vita_cleanup();
@@ -77,6 +66,7 @@ int retro_environment_callback(unsigned cmd, void *data)
     // put a return here, hence the stupid printf.
     if (curr_frame == 0)
         printf("Inside of retro_environment_callback");
+
     return 0;
 }
 
@@ -146,22 +136,4 @@ void vita_cleanup()
     vita2d_fini();
     audio_shutdown();
     video_shutdown();
-}
-
-/***
- * Should simply return the filepath of the ROM, but replacing its file extension
- * with the given extension.
- */
-const char* S9xGetFilename(const char* extension, uint32_t dirtype)
-{
-    size_t len = strlen(rom_path);
-    return strcat(strndup(rom_path, len - 3), extension);
-}
-
-/***
- * Should simply return the folder that the ROM was loaded from.
- */
-const char* S9xGetDirectory(uint32_t dirtype)
-{
-    return strndup(rom_path, strrchr(rom_path, '/') - rom_path + 1);
 }
