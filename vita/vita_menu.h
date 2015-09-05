@@ -10,9 +10,9 @@
 #include <string.h>
 
 #include <psp2/io/stat.h>
+#include <psp2/io/fcntl.h>
 #include <psp2/ctrl.h>
 #include <psp2/types.h>
-#include <psp2/io/fcntl.h>
 
 #include <psplib/pl_file.h>
 #include <psplib/image.h>
@@ -58,14 +58,10 @@
 #define DISPLAY_MODE_FIT_HEIGHT  2
 #define DISPLAY_MODE_FILL_SCREEN 3
 
-#define JOY 0x1000
-#define SPC 0x2000
-
-#define CODE_MASK(x) (x & 0xff)
-
-#define SPC_MENU               1
-
-#define MAP_BUTTONS            18
+// we start these at 12 because 0-11 are reserved
+// for SNES buttons
+#define SPC_MENU               12
+#define SPC_UNMAPPED           13
 
 #define MAP_ANALOG_UP          0
 #define MAP_ANALOG_DOWN        1
@@ -86,6 +82,8 @@
 #define MAP_BUTTON_LRTRIGGERS  16
 #define MAP_BUTTON_STARTSELECT 17
 
+#define MAP_BUTTONS            18
+
 typedef struct
 {
     int   ShowFps;
@@ -99,10 +97,13 @@ typedef struct
 
 struct ButtonConfig
 {
-  unsigned int ButtonMap[MAP_BUTTONS];
+    unsigned int ButtonMap[MAP_BUTTONS];
 };
 
 extern EmulatorOptions Options;
+extern struct ButtonConfig ActiveConfig;
+extern struct ButtonConfig DefaultConfig;
+extern unsigned int PhysicalButtonMap[MAP_BUTTONS];
 extern int OptionsChanged;
 
 int  InitMenu();

@@ -69,22 +69,22 @@ PL_MENU_OPTIONS_BEGIN(ControlModeOptions)
 PL_MENU_OPTIONS_END
 PL_MENU_OPTIONS_BEGIN(ButtonMapOptions)
     /* Unmapped */
-    PL_MENU_OPTION("None", 0)
+    PL_MENU_OPTION("None", SPC_UNMAPPED)
     /* Special */
-    PL_MENU_OPTION("Special: Open Menu", SPC | SPC_MENU)
+    PL_MENU_OPTION("Special: Open Menu", SPC_MENU)
     /* Buttons */
-    PL_MENU_OPTION("Up",       JOY | 0x001)
-    PL_MENU_OPTION("Down",     JOY | 0x002)
-    PL_MENU_OPTION("Left",     JOY | 0x004)
-    PL_MENU_OPTION("Right",    JOY | 0x008)
-    PL_MENU_OPTION("Button A", JOY | 0x010)
-    PL_MENU_OPTION("Button B", JOY | 0x020)
-    PL_MENU_OPTION("Button X", JOY | 0x040)
-    PL_MENU_OPTION("Button Y", JOY | 0x080)
-    PL_MENU_OPTION("Button L", JOY | 0x100)
-    PL_MENU_OPTION("Button R", JOY | 0x200)
-    PL_MENU_OPTION("Start",    JOY | 0x400)
-    PL_MENU_OPTION("Select",   JOY | 0x800)
+    PL_MENU_OPTION("Up",       RETRO_DEVICE_ID_JOYPAD_UP)
+    PL_MENU_OPTION("Down",     RETRO_DEVICE_ID_JOYPAD_DOWN)
+    PL_MENU_OPTION("Left",     RETRO_DEVICE_ID_JOYPAD_LEFT)
+    PL_MENU_OPTION("Right",    RETRO_DEVICE_ID_JOYPAD_RIGHT)
+    PL_MENU_OPTION("Button A", RETRO_DEVICE_ID_JOYPAD_A)
+    PL_MENU_OPTION("Button B", RETRO_DEVICE_ID_JOYPAD_B)
+    PL_MENU_OPTION("Button X", RETRO_DEVICE_ID_JOYPAD_X)
+    PL_MENU_OPTION("Button Y", RETRO_DEVICE_ID_JOYPAD_Y)
+    PL_MENU_OPTION("Button L", RETRO_DEVICE_ID_JOYPAD_L)
+    PL_MENU_OPTION("Button R", RETRO_DEVICE_ID_JOYPAD_R)
+    PL_MENU_OPTION("Start",    RETRO_DEVICE_ID_JOYPAD_START)
+    PL_MENU_OPTION("Select",   RETRO_DEVICE_ID_JOYPAD_SELECT)
 PL_MENU_OPTIONS_END
 
 /* Define the actual menus */
@@ -217,81 +217,55 @@ PspUiMenu SystemUiMenu =
     OnMenuItemChanged, /* OnItemChanged() */
 };
 
-/* Game configuration (includes button maps) */
+/* The active button configuration */
 struct ButtonConfig ActiveConfig;
 
-/* Default configuration */
+/* Default button configuration */
 struct ButtonConfig DefaultConfig =
 {
-
     {
-        JOY | 0x001, /* Analog Up */
-        JOY | 0x002, /* Analog Down */
-        JOY | 0x004, /* Analog Left */
-        JOY | 0x008, /* Analog Right */
-        JOY | 0x001, /* D-pad Up */
-        JOY | 0x002, /* D-pad Down */
-        JOY | 0x004, /* D-pad Left */
-        JOY | 0x008, /* D-pad Right */
-        JOY | 0x080, /* Square */
-        JOY | 0x020, /* Cross */
-        JOY | 0x010, /* Circle */
-        JOY | 0x040, /* Triangle */
-        JOY | 0x100, /* L Trigger */
-        JOY | 0x200, /* R Trigger */
-        JOY | 0x800, /* Select */
-        JOY | 0x400, /* Start */
-        SPC | SPC_MENU, /* L+R Triggers */
-        0, /* Start + Select */
+        RETRO_DEVICE_ID_JOYPAD_UP, /* Analog Up */
+        RETRO_DEVICE_ID_JOYPAD_DOWN, /* Analog Down */
+        RETRO_DEVICE_ID_JOYPAD_LEFT, /* Analog Left */
+        RETRO_DEVICE_ID_JOYPAD_RIGHT, /* Analog Right */
+        RETRO_DEVICE_ID_JOYPAD_UP, /* D-pad Up */
+        RETRO_DEVICE_ID_JOYPAD_DOWN, /* D-pad Down */
+        RETRO_DEVICE_ID_JOYPAD_LEFT, /* D-pad Left */
+        RETRO_DEVICE_ID_JOYPAD_RIGHT, /* D-pad Right */
+        RETRO_DEVICE_ID_JOYPAD_Y, /* Square */
+        RETRO_DEVICE_ID_JOYPAD_B, /* Cross */
+        RETRO_DEVICE_ID_JOYPAD_A, /* Circle */
+        RETRO_DEVICE_ID_JOYPAD_X, /* Triangle */
+        RETRO_DEVICE_ID_JOYPAD_L, /* L Trigger */
+        RETRO_DEVICE_ID_JOYPAD_R, /* R Trigger */
+        RETRO_DEVICE_ID_JOYPAD_SELECT, /* Select */
+        RETRO_DEVICE_ID_JOYPAD_START, /* Start */
+        SPC_MENU, /* L+R Triggers */
+        SPC_UNMAPPED, /* Start + Select */
     }
 };
 
-/* Button masks */
-const uint64_t ButtonMask[] =
+/* Mapping of internal button combinations to their physical buttons */
+unsigned int PhysicalButtonMap[MAP_BUTTONS] = 
 {
-    PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER,
-    PSP_CTRL_START    | PSP_CTRL_SELECT,
-    PSP_CTRL_ANALUP,
-    PSP_CTRL_ANALDOWN,
-    PSP_CTRL_ANALLEFT,
-    PSP_CTRL_ANALRIGHT,
-    PSP_CTRL_UP,
-    PSP_CTRL_DOWN,
-    PSP_CTRL_LEFT,
-    PSP_CTRL_RIGHT,
-    PSP_CTRL_SQUARE,
-    PSP_CTRL_CROSS,
-    PSP_CTRL_CIRCLE,
-    PSP_CTRL_TRIANGLE,
-    PSP_CTRL_LTRIGGER,
-    PSP_CTRL_RTRIGGER,
-    PSP_CTRL_SELECT,
-    PSP_CTRL_START,
-    0 /* End */
-};
-
-/* Button map ID's */
-const int ButtonMapId[] =
-{
-    MAP_BUTTON_LRTRIGGERS,
-    MAP_BUTTON_STARTSELECT,
-    MAP_ANALOG_UP,
-    MAP_ANALOG_DOWN,
-    MAP_ANALOG_LEFT,
-    MAP_ANALOG_RIGHT,
-    MAP_BUTTON_UP,
-    MAP_BUTTON_DOWN,
-    MAP_BUTTON_LEFT,
-    MAP_BUTTON_RIGHT,
-    MAP_BUTTON_SQUARE,
-    MAP_BUTTON_CROSS,
-    MAP_BUTTON_CIRCLE,
-    MAP_BUTTON_TRIANGLE,
-    MAP_BUTTON_LTRIGGER,
-    MAP_BUTTON_RTRIGGER,
-    MAP_BUTTON_SELECT,
-    MAP_BUTTON_START,
-    -1
+    0,
+    0,
+    0,
+    0,
+    PSP2_CTRL_UP,
+    PSP2_CTRL_DOWN,
+    PSP2_CTRL_LEFT,
+    PSP2_CTRL_RIGHT,
+    PSP2_CTRL_SQUARE,
+    PSP2_CTRL_CROSS,
+    PSP2_CTRL_CIRCLE,
+    PSP2_CTRL_TRIANGLE,
+    PSP2_CTRL_LTRIGGER,
+    PSP2_CTRL_RTRIGGER,
+    PSP2_CTRL_SELECT,
+    PSP2_CTRL_START,
+    0,
+    0
 };
 
 int InitMenu()

@@ -11,6 +11,7 @@
 #include <psp2/io/fcntl.h>
 #include <psp2/ctrl.h>
 
+#include "vita_menu.h"
 #include "../libretro/libretro.h"
 
 // helpers for input
