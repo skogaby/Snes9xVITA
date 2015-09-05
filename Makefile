@@ -2,7 +2,7 @@ TARGET = Snes9xVITA
 OBJS = src/apu.o src/bsx.o src/c4emu.o src/cheats.o src/controls.o src/cpu.o src/cpuexec.o \
 	   src/dsp.o src/fxemu.o src/globals.o src/memmap.o src/obc1.o src/ppu.o src/sa1.o \
 	   src/sdd1.o src/seta.o src/snapshot.o src/spc7110.o src/srtc.o src/tile.o \
-	   libretro/libretro.o libretro/memory_stream.o vita/font_data.o vita/font.o vita/file_chooser.o \
+	   libretro/libretro.o libretro/memory_stream.o vita/font_data.o vita/font.o \
        vita/utils.o vita/vita_input.o vita/vita_audio.o vita/vita_video.o vita/vita_menu.o vita/main.o
 
 LIBS = -lpsplib -lSceDisplay_stub -lSceGxm_stub -lScePower_stub -lSceCtrl_stub -lSceTouch_stub \

@@ -16,9 +16,13 @@
 
 #include <vita2d.h>
 #include <psplib/video.h>
+
+#include "vita_menu.h"
 #include "../libretro/libretro.h"
 
 extern unsigned long curr_frame;
+extern float scale_x, scale_y;
+extern vita2d_texture *tex;
 
 bool retro_video_refresh_callback(const void *data, unsigned width, unsigned height, size_t pitch);
 void show_fps();

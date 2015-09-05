@@ -19,6 +19,7 @@ static const char EmptySlotText[] = "\026\244\020 Save";
 
 char GameName[PATH_MAX];
 EmulatorOptions Options;
+int OptionsChanged;
 
 pl_file_path CurrentGame = "";
 pl_file_path GamePath;
@@ -38,7 +39,6 @@ PL_MENU_OPTIONS_END
 PL_MENU_OPTIONS_BEGIN(ScreenSizeOptions)
     PL_MENU_OPTION("Actual size", DISPLAY_MODE_UNSCALED)
     PL_MENU_OPTION("4:3 scaled (2x)", DISPLAY_MODE_2X)
-	PL_MENU_OPTION("4:3 scaled (3x)", DISPLAY_MODE_3X)
     PL_MENU_OPTION("4:3 scaled (fit height)", DISPLAY_MODE_FIT_HEIGHT)
     PL_MENU_OPTION("16:9 scaled (fit screen)", DISPLAY_MODE_FILL_SCREEN)
 PL_MENU_OPTIONS_END
@@ -154,6 +154,8 @@ static int OnMenuOk(const void *uimenu, const void* sel_item);
 static int OnMenuButtonPress(const struct PspUiMenu *uimenu, pl_menu_item* sel_item, uint32_t button_mask);
 
 void OnSystemRender(const void *uiobject, const void *item_obj);
+
+static void OnOptionsChange();
 
 void clear_screen();
 
@@ -293,8 +295,8 @@ int InitMenu()
     /* Reset variables */
     TabIndex = TAB_ABOUT;
     Background = NULL;
-    // GameName = NULL;
     GameName[0] = '\0';
+    OptionsChanged = false;
 
     /* Initialize paths */
     sprintf(SaveStatePath, "%ssavedata/", pl_psp_get_app_directory());
@@ -381,7 +383,7 @@ int InitMenu()
 void LoadOptions()
 {
     pl_file_path path;
-    snprintf(path, sizeof(path) - 1, "%snes9xvita.ini", pl_psp_get_app_directory());
+    snprintf(path, sizeof(path) - 1, "%ssnes9xvita.ini", pl_psp_get_app_directory());
 
     /* Initialize INI structure */
     pl_ini_file init;
@@ -412,7 +414,7 @@ void LoadOptions()
 int SaveOptions()
 {
     pl_file_path path;
-    snprintf(path, sizeof(path) - 1, "%snes9xvita.ini", pl_psp_get_app_directory());
+    snprintf(path, sizeof(path) - 1, "%ssnes9xvita.ini", pl_psp_get_app_directory());
 
     /* Initialize INI structure */
     pl_ini_file init;
@@ -450,10 +452,6 @@ void DisplayMenu()
     do
     {
         ResumeEmulation = 0;
-
-        /* Set normal clock frequency */
-        //pl_psp_set_clock_freq(333);
-        /* Set buttons to autorepeat */
         pspCtrlSetPollingMode(PSP_CTRL_AUTOREPEAT);
 
         /* Display appropriate tab */
@@ -509,6 +507,10 @@ void DisplayMenu()
         if (!ExitPSP)
         {
             clear_screen();
+
+            // make sure our emulation environment is setup
+            // according to the options
+            OnOptionsChange();
 
             while(ResumeEmulation)
             { 
@@ -1093,7 +1095,9 @@ const char* S9xGetDirectory(uint32_t dirtype)
     return strndup(GameName, strrchr(GameName, '/') - GameName + 1);
 }
 
-
+/***
+ * Clears the screen...
+ */
 void clear_screen()
 {
     vita2d_start_drawing();
@@ -1111,4 +1115,18 @@ void clear_screen()
     vita2d_start_drawing();
     vita2d_clear_screen();
     vita2d_end_drawing();
+}
+
+/***
+ * Called before we enter the emulation loop,
+ * handles any changes that may have been made
+ * in the options.
+ */
+void OnOptionsChange()
+{
+    OptionsChanged = true;
+
+    // set CPU clock speed
+    // TODO: migrate to vita-toolchain and use sceSetArmCpuClockFrequency
+    scePowerIsPowerOnline(Options.ClockFreq);
 }

@@ -27,6 +27,7 @@
 #include "../src/snes9x.h"
 #include "../src/memmap.h"
 #include "../libretro/libretro.h"
+#include "../vita/vita_video.h"
 
 #define PSP_APP_NAME "Snes9xVITA"
 #define PSP_APP_VER  "1.0.0 beta"
@@ -54,9 +55,8 @@
 
 #define DISPLAY_MODE_UNSCALED    0
 #define DISPLAY_MODE_2X 1
-#define DISPLAY_MODE_3X 2
-#define DISPLAY_MODE_FIT_HEIGHT  3
-#define DISPLAY_MODE_FILL_SCREEN 4
+#define DISPLAY_MODE_FIT_HEIGHT  2
+#define DISPLAY_MODE_FILL_SCREEN 3
 
 #define JOY 0x1000
 #define SPC 0x2000
@@ -101,6 +101,9 @@ struct ButtonConfig
 {
   unsigned int ButtonMap[MAP_BUTTONS];
 };
+
+extern EmulatorOptions Options;
+extern int OptionsChanged;
 
 int  InitMenu();
 void DisplayMenu();

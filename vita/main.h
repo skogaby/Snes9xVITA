@@ -20,7 +20,6 @@
 #include "vita_audio.h"
 #include "vita_video.h"
 #include "vita_menu.h"
-#include "file_chooser.h"
 #include "../libretro/libretro.h"
 
 PSP2_MODULE_INFO(0, 0, "Snes9xVITA");

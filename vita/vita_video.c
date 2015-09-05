@@ -5,8 +5,8 @@
 
 // helpers for rendering
 unsigned long curr_frame;
+float scale_x, scale_y;
 clock_t last_render_time;
-int scale;
 int pos_x, pos_y;
 unsigned short h, w;
 vita2d_texture *tex;
@@ -19,18 +19,44 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
 {
 	curr_frame++;
 
-	// initialize our main render texture once we get the dimensions for the first time
-	if(!tex)
+    // initialize our render variables if they're uninitalized, or
+    // if they've changed due to user action
+	if(!tex || OptionsChanged)
 	{
-		printf("Initializing main render texture");
+        OptionsChanged = false;
+
+		// handle changes to scale from the options
+        switch (Options.DisplayMode)
+        {
+        case DISPLAY_MODE_UNSCALED:
+            scale_x = 1.0f;
+            scale_y = 1.0f;
+            break;
+        case DISPLAY_MODE_2X:
+            scale_x = 2.0f;
+            scale_y = 2.0f;
+            break;
+        case DISPLAY_MODE_FIT_HEIGHT:
+            scale_y = (float)SCREEN_H / (float)height;
+            scale_x = scale_y;
+            break;
+        case DISPLAY_MODE_FILL_SCREEN:
+            scale_x = (float)SCREEN_W / (float)width;
+            scale_y = (float)SCREEN_H / (float)height;
+            break;
+        }
 
 		curr_frame = 0;
-		scale = 2;
-		tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
-		tex_data = vita2d_texture_get_datap(tex);
-		pos_x = (SCREEN_W / 2) - (width / 2) * scale;
-		pos_y = (SCREEN_H / 2) - (height / 2) * scale;
+		pos_x = (SCREEN_W / 2) - (width / 2) * scale_x;
+		pos_y = (SCREEN_H / 2) - (height / 2) * scale_y;
 	}
+
+    // initialize our main render texture once we get the dimensions for the first time
+    if (!tex)
+    {
+        tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
+        tex_data = vita2d_texture_get_datap(tex);
+    }
 
 	// copy the input pixels into the output buffer
 	const uint16_t* in_pixels = (const uint16_t*)data;
@@ -44,7 +70,7 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
     // draw the screen
 	vita2d_start_drawing();
 
-	vita2d_draw_texture_scale(tex, pos_x, pos_y, scale, scale);
+	vita2d_draw_texture_scale(tex, pos_x, pos_y, scale_x, scale_y);
     show_fps();
 
 	vita2d_end_drawing();
@@ -58,11 +84,11 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
 void show_fps()
 {
     clock_t now = clock();
-    float curr_fps = 1000000.0F / ((float)now - (float)last_render_time);
+    int curr_fps = (int)(1000000.0F / ((float)now - (float)last_render_time));
     last_render_time = now;
 
-    vita2d_draw_rectangle(10, 10, 128, 16, 0xFF000000);
-    font_draw_stringf(10, 10, 0xFFFFFFFF, "FPS: %d", (int)curr_fps);
+    vita2d_draw_rectangle(10, 10, curr_fps > 99 ? 128 : 112, 16, 0xFF000000);
+    font_draw_stringf(10, 10, 0xFFFFFFFF, "FPS: %d", curr_fps);
 }
 
 /***

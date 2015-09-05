@@ -10,10 +10,6 @@ PspImage *Screen;
  */
 int main()
 {
-    // TODO: use the correct function once I'm on vita-toolchain
-    // set the CPU clock speed to 444MHz
-    scePowerIsPowerOnline(444);
-
     // first, initialize Vita2D
     printf("Starting Snes9xVITA");
     vita2d_init_advanced(8 * 1024 * 1024);
@@ -75,7 +71,6 @@ int retro_environment_callback(unsigned cmd, void *data)
  */
 void vita_cleanup()
 {
-
     free(keymap);
     free(pad);
 
