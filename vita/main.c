@@ -19,7 +19,7 @@ int main()
     setup_callbacks();
     setup_audio();
 
-    pl_psp_init("cache0:/Snes9x/");
+    pl_psp_init("cache0:/Snes9xVITA/");
 
     // get the game ready
     if (InitMenu())

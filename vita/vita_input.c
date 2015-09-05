@@ -49,10 +49,9 @@ void retro_input_poll_callback()
 	keymap[RETRO_DEVICE_ID_JOYPAD_RIGHT] = (keys_down & PSP2_CTRL_RIGHT) || (pad->lx > 128 + JOY_THRESHOLD);
 
 	// TODO: make this user-configurable
-	// take the user back to the menu if they
-	// press up + triangle + L + R
-	if(keymap[RETRO_DEVICE_ID_JOYPAD_X] && keymap[RETRO_DEVICE_ID_JOYPAD_UP] && 
-		keymap[RETRO_DEVICE_ID_JOYPAD_L] && keymap[RETRO_DEVICE_ID_JOYPAD_R])
+	// take the user back to the menu if 
+    // they press L + R
+	if(keymap[RETRO_DEVICE_ID_JOYPAD_L] && keymap[RETRO_DEVICE_ID_JOYPAD_R])
 	{
         ResumeEmulation = 0;
 	}

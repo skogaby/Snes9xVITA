@@ -387,7 +387,7 @@ int InitMenu()
 void LoadOptions()
 {
     pl_file_path path;
-    snprintf(path, sizeof(path) - 1, "%ssnes9xvita.ini", pl_psp_get_app_directory());
+    snprintf(path, sizeof(path) - 1, "%s%s", pl_psp_get_app_directory(), OptionsFile);
 
     /* Initialize INI structure */
     pl_ini_file init;
@@ -396,19 +396,17 @@ void LoadOptions()
 
     /* Load values */
     Options.DisplayMode = pl_ini_get_int(&init, "Video", "Display Mode", DISPLAY_MODE_UNSCALED);
-    Options.UpdateFreq = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
-    Options.Frameskip = pl_ini_get_int(&init, "Video", "Frameskip", 1);
-    Options.VSync = pl_ini_get_int(&init, "Video", "VSync", 1);
-    Options.ClockFreq = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
-    Options.ShowFps = pl_ini_get_int(&init, "Video", "Show FPS", 0);
+    Options.UpdateFreq  = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
+    Options.Frameskip   = pl_ini_get_int(&init, "Video", "Frameskip", 1);
+    Options.VSync       = pl_ini_get_int(&init, "Video", "VSync", 1);
+    Options.ClockFreq   = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
+    Options.ShowFps     = pl_ini_get_int(&init, "Video", "Show FPS", 0);
 
     Options.ControlMode = pl_ini_get_int(&init, "Menu", "Control Mode", 0);
-    UiMetric.Animate = pl_ini_get_int(&init, "Menu", "Animate", 1);
+    UiMetric.Animate    = pl_ini_get_int(&init, "Menu", "Animate", 1);
 
     // TODO: make this control sound emulation
     mute = !pl_ini_get_int(&init, "System", "Sound", 1);
-
-    pl_ini_get_string(&init, "File", "Game Path", NULL, GamePath, sizeof(GamePath));
 
     /* Clean up */
     pl_ini_destroy(&init);
@@ -418,7 +416,7 @@ void LoadOptions()
 int SaveOptions()
 {
     pl_file_path path;
-    snprintf(path, sizeof(path) - 1, "%ssnes9xvita.ini", pl_psp_get_app_directory());
+    snprintf(path, sizeof(path) - 1, "%s%s", pl_psp_get_app_directory(), OptionsFile);
 
     /* Initialize INI structure */
     pl_ini_file init;
