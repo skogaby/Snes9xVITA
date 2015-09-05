@@ -13,7 +13,6 @@ int main()
     // first, initialize Vita2D
     printf("Starting Snes9xVITA");
     vita2d_init_advanced(8 * 1024 * 1024);
-    vita2d_set_vblank_wait(false);
 
     // do some setup
     setup_input();

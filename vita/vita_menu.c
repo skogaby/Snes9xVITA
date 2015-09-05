@@ -30,6 +30,10 @@ unsigned char mute = 0;
 static int TabIndex;
 static PspImage *Background;
 static PspImage *NoSaveIcon;
+static int TicksPerUpdate;
+static uint32_t TicksPerSecond;
+static uint64_t LastTick;
+static uint64_t CurrentTick;
 
 /* Define various menu options */
 PL_MENU_OPTIONS_BEGIN(ToggleOptions)
@@ -47,13 +51,13 @@ PL_MENU_OPTIONS_BEGIN(FrameLimitOptions)
     PL_MENU_OPTION("60 fps (NTSC)", 60)
 PL_MENU_OPTIONS_END
 PL_MENU_OPTIONS_BEGIN(FrameSkipOptions)
-    PL_MENU_OPTION("No skipping",   1)
-    PL_MENU_OPTION("Skip 1 frame",  2)
-    PL_MENU_OPTION("Skip 2 frames", 3)
-    PL_MENU_OPTION("Skip 3 frames", 4)
-    PL_MENU_OPTION("Skip 4 frames", 5)
-    PL_MENU_OPTION("Skip 5 frames", 6)
-    PL_MENU_OPTION("Skip 6 frames", 7)
+    PL_MENU_OPTION("No skipping",   0)
+    PL_MENU_OPTION("Skip 1 frame",  1)
+    PL_MENU_OPTION("Skip 2 frames", 2)
+    PL_MENU_OPTION("Skip 3 frames", 3)
+    PL_MENU_OPTION("Skip 4 frames", 4)
+    PL_MENU_OPTION("Skip 5 frames", 5)
+    PL_MENU_OPTION("Skip 6 frames", 6)
 PL_MENU_OPTIONS_END
 PL_MENU_OPTIONS_BEGIN(PspClockFreqOptions)
     PL_MENU_OPTION("333 MHz", 333)
@@ -504,6 +508,7 @@ void DisplayMenu()
             break;
         }
 
+        // enter the emulation loop once we're done with the menu
         if (!ExitPSP)
         {
             clear_screen();
@@ -514,7 +519,17 @@ void DisplayMenu()
 
             while(ResumeEmulation)
             { 
+                // run one frame of the emulator
                 retro_run();
+
+                // wait if needed 
+                if (Options.UpdateFreq)
+                {
+                    do { sceRtcGetCurrentTick(&CurrentTick); } 
+                    while (CurrentTick - LastTick < TicksPerUpdate);
+
+                    LastTick = CurrentTick;
+                }
             }
         }
     } while (!ExitPSP);
@@ -1129,4 +1144,16 @@ void OnOptionsChange()
     // set CPU clock speed
     // TODO: migrate to vita-toolchain and use sceSetArmCpuClockFrequency
     scePowerIsPowerOnline(Options.ClockFreq);
+
+    // set vsync
+    vita2d_set_vblank_wait(Options.VSync);
+
+    // recompute update frequency
+    TicksPerSecond = sceRtcGetTickResolution();
+
+    if (Options.UpdateFreq)
+    {
+        TicksPerUpdate = TicksPerSecond / (Options.UpdateFreq / (Options.Frameskip + 1));
+        sceRtcGetCurrentTick(&LastTick);
+    }
 }

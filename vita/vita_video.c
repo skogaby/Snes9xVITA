@@ -71,10 +71,13 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
 	vita2d_start_drawing();
 
 	vita2d_draw_texture_scale(tex, pos_x, pos_y, scale_x, scale_y);
-    show_fps();
+
+    if(Options.ShowFps)
+        show_fps();
 
 	vita2d_end_drawing();
 	vita2d_swap_buffers();
+
 	return true;
 }
 
