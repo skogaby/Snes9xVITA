@@ -1323,7 +1323,6 @@ bool8 LoadSRAM()
     if (size)
     {
         file = sceIoOpen(sramName, PSP2_O_RDONLY, 0777);
-        free(sramName);
 
         if (file)
         {
@@ -1336,6 +1335,7 @@ bool8 LoadSRAM()
             if (Settings.SRTC || Settings.SPC7110RTC)
                 LoadSRTC();
 
+            free(sramName);
             return (TRUE);
         }
         else if (Settings.BS && !Settings.BSXItself)
@@ -1361,13 +1361,16 @@ bool8 LoadSRAM()
                     memmove(Memory.SRAM, Memory.SRAM + 512, size);
 
                 S9xMessage(S9X_INFO, S9X_ROM_INFO, "The SRAM file wasn't found: BS-X.srm was read instead.");
+                free(sramName);
                 return (TRUE);
             }
 
             S9xMessage(S9X_INFO, S9X_ROM_INFO, "The SRAM file wasn't found, BS-X.srm wasn't found either.");
+            free(sramName);
             return (FALSE);
         }
 
+        free(sramName);
         return (FALSE);
     }
 
@@ -1377,19 +1380,22 @@ bool8 LoadSRAM()
 
 bool8 SaveSRAM ()
 {
-	const char* filename = S9xGetFilename(".srm", 0);
-	SceUID file;
-	int	size;
-	char sramName[PATH_MAX + 1];
+    SceUID file;
+    int	size;
 
-	if (Settings.SuperFX && Memory.ROMType < 0x15) /* doesn't have SRAM */
-		return (TRUE);
+	const char* sramName = S9xGetFilename(".srm", 0);
 
+    if (Settings.SuperFX && Memory.ROMType < 0x15) /* doesn't have SRAM */
+    {
+        free(sramName);
+        return (TRUE);
+    }
+        
 	if (Settings.SA1 && Memory.ROMType == 0x34)    /* doesn't have SRAM */
-		return (TRUE);
-
-	strcpy(sramName, filename);
-	free(filename);
+    {
+        free(sramName);
+        return (TRUE);
+    }
 
 	if (Multi.cartType && Multi.sramSizeB)
 	{
@@ -1427,10 +1433,12 @@ bool8 SaveSRAM ()
 			if (Settings.SRTC || Settings.SPC7110RTC)
 				SaveSRTC();
 
+            free(sramName);
 			return (TRUE);
 		}
 	}
 
+    free(sramName);
 	return (FALSE);
 }
 

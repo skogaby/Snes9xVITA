@@ -1073,12 +1073,16 @@ void TrashMenu()
 */
 const char* S9xGetFilename(const char* extension, uint32_t dirtype)
 {
-    char* path = (char*)malloc(PATH_MAX);
-    size_t len = strlen(GameName);
+    static char filename[PATH_MAX];
+    char drive[PATH_MAX];
+    char dir[PATH_MAX];
+    char fname[PATH_MAX];
+    char ext[PATH_MAX];
 
-    // copy the first part of the ROM name
-    strncpy(path, GameName, len - 4);
-    return strcat(path, extension);
+    _splitpath(Memory.ROMFilename, drive, dir, fname, ext);
+    _makepath(filename, drive, dir, fname, extension + 1);
+
+    return (filename);
 }
 
 /***
@@ -1086,9 +1090,7 @@ const char* S9xGetFilename(const char* extension, uint32_t dirtype)
 */
 const char* S9xGetDirectory(uint32_t dirtype)
 {
-    char* path = (char*)malloc(PATH_MAX);
-
-    strncpy(path, GameName, strrchr(GameName, '/') - GameName + 1);
+    return strndup(GameName, strrchr(GameName, '/') - GameName + 1);
 }
 
 

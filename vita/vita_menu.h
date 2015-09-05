@@ -25,6 +25,7 @@
 #include <psplib/video.h>
 
 #include "../src/snes9x.h"
+#include "../src/memmap.h"
 #include "../libretro/libretro.h"
 
 #define PSP_APP_NAME "Snes9xVITA"
