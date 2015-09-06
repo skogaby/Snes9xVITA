@@ -281,8 +281,10 @@ int InitMenu()
 
     if (!pl_file_exists(SaveStatePath))
         pl_file_mkdir_recursive(SaveStatePath);
-        
 
+    if (!pl_file_exists(ScreenshotPath))
+        pl_file_mkdir_recursive(ScreenshotPath);
+        
     /* Initialize options */
     LoadOptions();
 
