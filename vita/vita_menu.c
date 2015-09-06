@@ -4,7 +4,6 @@
 
 #include "vita_menu.h"
 
-extern PspImage *Screen;
 extern int ResumeEmulation;
 
 static const char *QuickloadFilter[] = { "SMC", "FIG", "SFC", "GD3", "GD7", "DX2", "BSX", "SWC", NULL };
@@ -847,9 +846,9 @@ int OnMenuOk(const void *uimenu, const void* sel_item)
             break;
 
         case SYSTEM_SCRNSHOT:
-
+            // TODO
             /* Save screenshot */
-            if (!pl_util_save_image_seq(ScreenshotPath, pl_file_get_filename(GameName), Screen))
+            if (false) //!pl_util_save_image_seq(ScreenshotPath, pl_file_get_filename(GameName), Screen))
                 pspUiAlert("ERROR: Screenshot not saved");
             else
                 pspUiAlert("Screenshot saved successfully");
@@ -1028,14 +1027,14 @@ static void DisplayStateTab()
 void OnSystemRender(const void *uiobject, const void *item_obj)
 {
     int w, h, x, y;
-    w = Screen->Viewport.Width*1.5;
-    h = Screen->Viewport.Height*1.5;
-    x = SCR_WIDTH - w - 16;
-    y = SCR_HEIGHT - h - 80;
+    w = 256;
+    h = 224;
+    x = SCREEN_W - w - 16;
+    y = SCREEN_H - h - 80;
 
     /* Draw a small representation of the screen */
     pspVideoShadowRect(x, y, x + w - 1, y + h - 1, PSP_COLOR_BLACK, 3);
-    pspVideoPutImage(Screen, x, y, w, h);
+    vita2d_draw_texture_scale(tex, x, y, 1.0f, 1.0f);
     pspVideoDrawRect(x, y, x + w - 1, y + h - 1, PSP_COLOR_GRAY);
 
     OnGenericRender(uiobject, item_obj);

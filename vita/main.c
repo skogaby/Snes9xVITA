@@ -3,8 +3,6 @@
 
 #include "main.h"
 
-PspImage *Screen;
-
 /***
  * Main entrypoint of the emulator
  */
