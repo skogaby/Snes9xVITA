@@ -9,13 +9,13 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include <psp2/display.h>
 #include <psp2/gxm.h>
 
 #include <vita2d.h>
 #include <psplib/video.h>
+#include <psplib/pl_perf.h>
 
 #include "vita_menu.h"
 #include "../libretro/libretro.h"

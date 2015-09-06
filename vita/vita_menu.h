@@ -29,9 +29,6 @@
 #include "../libretro/libretro.h"
 #include "../vita/vita_video.h"
 
-#define PSP_APP_NAME "Snes9xVITA"
-#define PSP_APP_VER  "1.0.0 beta"
-
 #define TAB_QUICKLOAD 0
 #define TAB_STATE     1
 #define TAB_CONTROL   2

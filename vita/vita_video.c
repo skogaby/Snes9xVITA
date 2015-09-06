@@ -6,11 +6,11 @@
 // helpers for rendering
 unsigned long curr_frame;
 float scale_x, scale_y;
-clock_t last_render_time;
 int pos_x, pos_y;
 unsigned short h, w;
 vita2d_texture *tex;
 void *tex_data;
+pl_perf_counter FpsCounter;
 
 /***
  * Callback for when a new frame is generated that we need to render.
@@ -86,12 +86,14 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
  */
 void show_fps()
 {
-    clock_t now = clock();
-    int curr_fps = (int)(1000000.0F / ((float)now - (float)last_render_time));
-    last_render_time = now;
+    static char fps_display[32];
+    sprintf(fps_display, " %3.02f", pl_perf_update_counter(&FpsCounter));
 
-    vita2d_draw_rectangle(10, 10, curr_fps > 99 ? 128 : 112, 16, 0xFF000000);
-    font_draw_stringf(10, 10, 0xFFFFFFFF, "FPS: %d", curr_fps);
+    int width = pspFontGetTextWidth(&PspStockFont, fps_display);
+    int height = pspFontGetLineHeight(&PspStockFont);
+
+    pspVideoFillRect(SCREEN_W - width, 0, SCREEN_W, height, PSP_COLOR_BLACK);
+    pspVideoPrint(&PspStockFont, SCR_WIDTH - width, 0, fps_display, PSP_COLOR_WHITE);
 }
 
 /***

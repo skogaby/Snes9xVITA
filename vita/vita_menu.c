@@ -1109,8 +1109,7 @@ void OnOptionsChange()
     OptionsChanged = true;
 
     // set CPU clock speed
-    // TODO: migrate to vita-toolchain and use sceSetArmCpuClockFrequency
-    scePowerIsPowerOnline(Options.ClockFreq);
+    scePowerSetArmClockFrequency(Options.ClockFreq);
 
     // set vsync
     vita2d_set_vblank_wait(Options.VSync);
