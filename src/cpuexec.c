@@ -187,6 +187,8 @@
 #include "cheats.h"
 #include "snapshot.h"
 
+#include "../vita/vita_menu.h"
+
 extern struct SLineData		LineData[240];
 extern struct SLineMatrixData	LineMatrixData[240];
 extern uint8	*HDMAMemPointers[8];
@@ -964,6 +966,7 @@ void S9xDoHEventProcessing (void)
 			SuperFX.oneLineDone = FALSE; // do this even without SFX
 
 			S9xAPUExecute();
+
 			CPU.Cycles -= Timings.H_Max;
 			S9xAPUSetReferenceTime(CPU.Cycles);
 

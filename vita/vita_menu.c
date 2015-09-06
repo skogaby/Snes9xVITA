@@ -24,7 +24,6 @@ pl_file_path CurrentGame = "";
 pl_file_path GamePath;
 pl_file_path SaveStatePath;
 pl_file_path ScreenshotPath;
-unsigned char mute = 0;
 
 static int TabIndex;
 static PspImage *Background;
@@ -90,6 +89,8 @@ PL_MENU_OPTIONS_END
 PL_MENU_ITEMS_BEGIN(OptionMenuDef)
     PL_MENU_HEADER("Video")
         PL_MENU_ITEM("Screen size", OPTION_DISPLAY_MODE, ScreenSizeOptions, "\026\250\020 Change screen size")
+    PL_MENU_HEADER("Audio")
+        PL_MENU_ITEM("Enable sound", OPTION_EMULATE_SOUND, ToggleOptions, "\026\001\020 Enable/disable sound")
     PL_MENU_HEADER("Performance")
         PL_MENU_ITEM("Frame limiter", OPTION_SYNC_FREQ, FrameLimitOptions, "\026\250\020 Change screen update frequency")
         PL_MENU_ITEM("Frame skipping", OPTION_FRAMESKIP, FrameSkipOptions, "\026\250\020 Change number of frames skipped per update")
@@ -123,8 +124,6 @@ PL_MENU_ITEMS_BEGIN(ControlMenuDef)
 PL_MENU_ITEMS_END
 
 PL_MENU_ITEMS_BEGIN(SystemMenuDef)
-    PL_MENU_HEADER("Audio")
-        PL_MENU_ITEM("Sound", SYSTEM_AUDIO, ToggleOptions, "\026\001\020 Enable/disable sound")
     PL_MENU_HEADER("System")
         PL_MENU_ITEM("Reset", SYSTEM_RESET, NULL, "\026\001\020 Reset")
         PL_MENU_ITEM("Save screenshot",  SYSTEM_SCRNSHOT, NULL, "\026\001\020 Save screenshot")
@@ -368,18 +367,17 @@ void LoadOptions()
     pl_ini_load(&init, path);
 
     /* Load values */
-    Options.DisplayMode = pl_ini_get_int(&init, "Video", "Display Mode", DISPLAY_MODE_UNSCALED);
-    Options.UpdateFreq  = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
-    Options.Frameskip   = pl_ini_get_int(&init, "Video", "Frameskip", 1);
-    Options.VSync       = pl_ini_get_int(&init, "Video", "VSync", 1);
-    Options.ClockFreq   = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
-    Options.ShowFps     = pl_ini_get_int(&init, "Video", "Show FPS", 0);
+    Options.DisplayMode  = pl_ini_get_int(&init, "Video", "Display Mode", DISPLAY_MODE_UNSCALED);
+    Options.UpdateFreq   = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
+    Options.Frameskip    = pl_ini_get_int(&init, "Video", "Frameskip", 1);
+    Options.VSync        = pl_ini_get_int(&init, "Video", "VSync", 1);
+    Options.ClockFreq    = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
+    Options.ShowFps      = pl_ini_get_int(&init, "Video", "Show FPS", 0);
 
-    Options.ControlMode = pl_ini_get_int(&init, "Menu", "Control Mode", 0);
-    UiMetric.Animate    = pl_ini_get_int(&init, "Menu", "Animate", 1);
+    Options.ControlMode  = pl_ini_get_int(&init, "Menu", "Control Mode", 0);
+    UiMetric.Animate     = pl_ini_get_int(&init, "Menu", "Animate", 1);
 
-    // TODO: make this control sound emulation
-    mute = !pl_ini_get_int(&init, "System", "Sound", 1);
+    Options.EmulateSound = pl_ini_get_int(&init, "Audio", "Emulate Sound", 1);
 
     /* Clean up */
     pl_ini_destroy(&init);
@@ -406,8 +404,7 @@ int SaveOptions()
     pl_ini_set_int(&init, "Menu", "Control Mode", Options.ControlMode);
     pl_ini_set_int(&init, "Menu", "Animate", UiMetric.Animate);
 
-    // TODO: make this control sound emulation
-    pl_ini_set_int(&init, "System", "Sound", !mute);
+    pl_ini_set_int(&init, "Audio", "Emulate Sound", Options.EmulateSound);
 
     /* Save INI file */
     int status = pl_ini_save(&init, path);
@@ -448,6 +445,8 @@ void DisplayMenu()
             /* Init menu options */
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_DISPLAY_MODE);
             pl_menu_select_option_by_value(item, (void*)Options.DisplayMode);
+            item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_EMULATE_SOUND);
+            pl_menu_select_option_by_value(item, (void*)Options.EmulateSound);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_SYNC_FREQ);
             pl_menu_select_option_by_value(item, (void*)Options.UpdateFreq);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_FRAMESKIP);
@@ -468,9 +467,6 @@ void DisplayMenu()
             SaveOptions();
             break;
         case TAB_SYSTEM:
-            item = pl_menu_find_item_by_id(&SystemUiMenu.Menu, SYSTEM_AUDIO);
-            // TODO: make this control sound emulation
-            pl_menu_select_option_by_value(item, (void*)!mute);
             pspUiOpenMenu(&SystemUiMenu, NULL);
             SaveOptions();
             break;
@@ -774,11 +770,6 @@ int OnMenuItemChanged(const struct PspUiMenu *uimenu, pl_menu_item* item, const 
         unsigned int value = (unsigned int)option->value;
         ActiveConfig.ButtonMap[item->id] = value;
     }
-    else if (uimenu == &SystemUiMenu)
-    {
-        // TODO: make this control sound emulation
-        mute = !(int)option->value;
-    }
     else if (uimenu == &OptionUiMenu)
     {
         int value = (int)option->value;
@@ -787,6 +778,9 @@ int OnMenuItemChanged(const struct PspUiMenu *uimenu, pl_menu_item* item, const 
         {
         case OPTION_DISPLAY_MODE:
             Options.DisplayMode = value;
+            break;
+        case OPTION_EMULATE_SOUND:
+            Options.EmulateSound = value;
             break;
         case OPTION_SYNC_FREQ:
             Options.UpdateFreq = value;
