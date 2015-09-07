@@ -44,7 +44,7 @@ all: $(TARGET).velf
 
 $(TARGET).velf: $(TARGET).elf
 		$(PREFIX)-strip -g $<
-		vita-elf-create  $< $@ $(VITASDK)/bin/db.json
+		vita-elf-create  $< $@ ./db.json ./extra.json
 
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $(ASFLAGS) $^ $(LIBS) -o $@
