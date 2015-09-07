@@ -56,6 +56,7 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
     {
         tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
         tex_data = vita2d_texture_get_datap(tex);
+        pl_perf_init_counter(&FpsCounter);
     }
 
 	// copy the input pixels into the output buffer
@@ -87,13 +88,13 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
 void show_fps()
 {
     static char fps_display[32];
-    sprintf(fps_display, " %3.02f", pl_perf_update_counter(&FpsCounter));
+    sprintf(fps_display, "FPS: %3.02f", pl_perf_update_counter(&FpsCounter));
 
     int width = pspFontGetTextWidth(&PspStockFont, fps_display);
     int height = pspFontGetLineHeight(&PspStockFont);
 
-    pspVideoFillRect(SCREEN_W - width, 0, SCREEN_W, height, PSP_COLOR_BLACK);
-    pspVideoPrint(&PspStockFont, SCR_WIDTH - width, 0, fps_display, PSP_COLOR_WHITE);
+    pspVideoFillRect(0, 0, width, height, PSP_COLOR_BLACK);
+    pspVideoPrint(&PspStockFont, 0, 0, fps_display, PSP_COLOR_WHITE);
 }
 
 /***
