@@ -27,7 +27,7 @@
 #include "../src/snes9x.h"
 #include "../src/memmap.h"
 #include "../libretro/libretro.h"
-#include "../vita/vita_video.h"
+#include "vita_video.h"
 
 #define TAB_QUICKLOAD 0
 #define TAB_STATE     1
@@ -103,6 +103,7 @@ extern struct ButtonConfig ActiveConfig;
 extern struct ButtonConfig DefaultConfig;
 extern unsigned int PhysicalButtonMap[MAP_BUTTONS];
 extern int OptionsChanged;
+extern PspImage *Screen;
 
 int  InitMenu();
 void DisplayMenu();

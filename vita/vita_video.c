@@ -11,6 +11,7 @@ unsigned short h, w;
 vita2d_texture *tex;
 void *tex_data;
 pl_perf_counter FpsCounter;
+PspImage *Screen;
 
 /***
  * Callback for when a new frame is generated that we need to render.
@@ -57,6 +58,34 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
         tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
         tex_data = vita2d_texture_get_datap(tex);
         pl_perf_init_counter(&FpsCounter);
+
+        // initialize PSPImage
+        if (Screen)
+            free(Screen);
+        int size = width * height * 2;
+
+        Screen = (PspImage*)malloc(sizeof(PspImage));
+
+        Screen->TextureFormat = SCE_GXM_TEXTURE_FORMAT_R5G6B5;
+        Screen->PalSize = (unsigned short)0;
+        memset(tex_data, 0, size);
+
+        Screen->Width = width;
+        Screen->Height = height;
+        Screen->Pixels = tex_data;
+        Screen->Texture = tex;
+
+        Screen->Viewport.X = 0;
+        Screen->Viewport.Y = 0;
+        Screen->Viewport.Width = width;
+        Screen->Viewport.Height = height;
+
+        int i;
+        for (i = 1; i < width; i *= 2);
+            Screen->PowerOfTwo = (i == width);
+        Screen->BytesPerPixel = 2;
+        Screen->FreeBuffer = 0;
+        Screen->Depth = 2;
     }
 
 	// copy the input pixels into the output buffer
