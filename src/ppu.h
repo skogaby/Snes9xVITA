@@ -297,6 +297,15 @@ struct InternalPPU
 	uint16	ScreenColors[256];
 	int	RenderedScreenWidth;
 	int	RenderedScreenHeight;
+
+    // adding internal support for frameskipping
+	bool8	RenderThisFrame;
+    uint32	FrameCount;
+    uint32	RenderedFramesCount;
+    uint32	DisplayedRenderedFrameCount;
+    uint32	TotalEmulatedFrames;
+    uint32	SkippedFrames;
+    uint32	FrameSkip;
 };
 
 struct SOBJ

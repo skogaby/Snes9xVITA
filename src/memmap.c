@@ -2568,6 +2568,8 @@ void InitROM (void)
 	Timings.NMIDMADelay  = 24;
 	Timings.IRQPendCount = 0;
 
+    IPPU.TotalEmulatedFrames = 0;
+
 	/* Hack games */
 
 	Settings.BlockInvalidVRAMAccess = Settings.BlockInvalidVRAMAccessMaster;

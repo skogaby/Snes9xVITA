@@ -197,7 +197,6 @@ static bool8 idle_loop_elimination_enable;
 
 void S9xMainLoop (void)
 {
-	//printf("Beginning S9xMainLoop");
 	do
 	{
 		register uint8	Op;
@@ -306,6 +305,17 @@ void S9xMainLoop (void)
 	{
 		CPU.Flags &= ~SCAN_KEYS_FLAG;
 	}
+
+    if (IPPU.SkippedFrames < Options.Frameskip)
+    {
+        IPPU.RenderThisFrame = FALSE;
+        IPPU.SkippedFrames++;
+    }
+    else
+    {
+        IPPU.RenderThisFrame = TRUE;
+        IPPU.SkippedFrames = 0;
+    }
 }
 
 
@@ -404,73 +414,83 @@ static INLINE void speedhacks_manager (void)
 
 static void S9xEndScreenRefresh (void)
 {
-	FLUSH_REDRAW();
+    if (IPPU.RenderThisFrame)
+    {
+        FLUSH_REDRAW();
 
-   PPU.GunVLatch = 1000; /* i.e., never latch */
-   PPU.GunHLatch = 0;
+        PPU.GunVLatch = 1000; /* i.e., never latch */
+        PPU.GunHLatch = 0;
 
-   if (!Settings.NormalControls && pad_read)
-      S9xControlEOF();
+        if (!Settings.NormalControls && pad_read)
+            S9xControlEOF();
 
-	pad_read      = FALSE;
+        pad_read = FALSE;
 
-	if(Settings.SpeedhackGameID > SPEEDHACK_NONE)
-		speedhacks_manager();
+        if (Settings.SpeedhackGameID > SPEEDHACK_NONE)
+            speedhacks_manager();
 
-	if (!(GFX.DoInterlace && GFX.InterlaceFrame == 0))
-		S9xDeinitUpdate(IPPU.RenderedScreenWidth, IPPU.RenderedScreenHeight);
+        if (!(GFX.DoInterlace && GFX.InterlaceFrame == 0))
+            S9xDeinitUpdate(IPPU.RenderedScreenWidth, IPPU.RenderedScreenHeight);
+    }
+    else
+    {
+        S9xControlEOF();
+    }
 
-	S9xApplyCheats();
+    S9xApplyCheats();
 
-	// flush the SRAM to disk if it's dirty
-	if (CPU.SRAMModified)
-	{
-		if (!CPU.AutoSaveTimer)
-		{
-			if (!(CPU.AutoSaveTimer = Settings.AutoSaveDelay * Memory.ROMFramesPerSecond))
-			{
-				CPU.SRAMModified = FALSE;
-			}
-		}
-		else
-		{
-			if (!--CPU.AutoSaveTimer)
-			{
-				SaveSRAM();
-				CPU.SRAMModified = FALSE;
-			}
-		}
-	}
+    // flush the SRAM to disk if it's dirty
+    if (CPU.SRAMModified)
+    {
+        if (!CPU.AutoSaveTimer)
+        {
+            if (!(CPU.AutoSaveTimer = Settings.AutoSaveDelay * Memory.ROMFramesPerSecond))
+            {
+                CPU.SRAMModified = FALSE;
+            }
+        }
+        else
+        {
+            if (!--CPU.AutoSaveTimer)
+            {
+                SaveSRAM();
+                CPU.SRAMModified = FALSE;
+            }
+        }
+    }
 }
 
 static void RenderLine (uint8 C)
 {
-	LineData[C].BG[0].VOffset = PPU.BG[0].VOffset + 1;
-	LineData[C].BG[0].HOffset = PPU.BG[0].HOffset;
-	LineData[C].BG[1].VOffset = PPU.BG[1].VOffset + 1;
-	LineData[C].BG[1].HOffset = PPU.BG[1].HOffset;
+    if (IPPU.RenderThisFrame)
+    {
+        LineData[C].BG[0].VOffset = PPU.BG[0].VOffset + 1;
+        LineData[C].BG[0].HOffset = PPU.BG[0].HOffset;
+        LineData[C].BG[1].VOffset = PPU.BG[1].VOffset + 1;
+        LineData[C].BG[1].HOffset = PPU.BG[1].HOffset;
 
-	if (PPU.BGMode == 7)
-	{
-		struct SLineMatrixData *p = &LineMatrixData[C];
-		p->MatrixA = PPU.MatrixA;
-		p->MatrixB = PPU.MatrixB;
-		p->MatrixC = PPU.MatrixC;
-		p->MatrixD = PPU.MatrixD;
-		p->CentreX = PPU.CentreX;
-		p->CentreY = PPU.CentreY;
-		p->M7HOFS  = PPU.M7HOFS;
-		p->M7VOFS  = PPU.M7VOFS;
-	}
-	else
-	{
-		LineData[C].BG[2].VOffset = PPU.BG[2].VOffset + 1;
-		LineData[C].BG[2].HOffset = PPU.BG[2].HOffset;
-		LineData[C].BG[3].VOffset = PPU.BG[3].VOffset + 1;
-		LineData[C].BG[3].HOffset = PPU.BG[3].HOffset;
-	}
+        if (PPU.BGMode == 7)
+        {
+            struct SLineMatrixData *p = &LineMatrixData[C];
+            p->MatrixA = PPU.MatrixA;
+            p->MatrixB = PPU.MatrixB;
+            p->MatrixC = PPU.MatrixC;
+            p->MatrixD = PPU.MatrixD;
+            p->CentreX = PPU.CentreX;
+            p->CentreY = PPU.CentreY;
+            p->M7HOFS = PPU.M7HOFS;
+            p->M7VOFS = PPU.M7VOFS;
+        }
+        else
+        {
+            LineData[C].BG[2].VOffset = PPU.BG[2].VOffset + 1;
+            LineData[C].BG[2].HOffset = PPU.BG[2].HOffset;
+            LineData[C].BG[3].VOffset = PPU.BG[3].VOffset + 1;
+            LineData[C].BG[3].HOffset = PPU.BG[3].HOffset;
+        }
 
-	IPPU.CurrentLine = C + 1;
+        IPPU.CurrentLine = C + 1;
+    }
 }
 
 static INLINE void S9xReschedule (void)

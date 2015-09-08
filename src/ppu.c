@@ -2371,103 +2371,117 @@ static void S9xComputeClipWindows (void)
 
 void S9xUpdateScreen (void)
 {
-	int clip;
-	uint32 Offset;
+    if (IPPU.OBJChanged || IPPU.InterlaceOBJ)
+        SetupOBJ();
 
-	if (IPPU.OBJChanged || IPPU.InterlaceOBJ)
-		SetupOBJ();
+    /* XXX: Check ForceBlank? Or anything else? */
+    PPU.RangeTimeOver |= GFX.OBJLines[GFX.EndY].RTOFlags;
 
-	/* XXX: Check ForceBlank? Or anything else? */
-	PPU.RangeTimeOver |= GFX.OBJLines[GFX.EndY].RTOFlags;
+    if (IPPU.RenderThisFrame)
+    {
+        int clip;
+        uint32 Offset;
 
-	GFX.StartY = IPPU.PreviousLine;
-	if ((GFX.EndY = IPPU.CurrentLine - 1) >= PPU.ScreenHeight)
-		GFX.EndY = PPU.ScreenHeight - 1;
+        GFX.StartY = IPPU.PreviousLine;
+        if ((GFX.EndY = IPPU.CurrentLine - 1) >= PPU.ScreenHeight)
+            GFX.EndY = PPU.ScreenHeight - 1;
 
-	if (!PPU.ForcedBlanking)
-	{
-		/* If force blank, may as well completely skip all this. 
-		
-		   We only did the OBJ because (AFAWK) the RTO flags are 
-		   updated even during force-blank. */
+        if (!PPU.ForcedBlanking)
+        {
+            /* If force blank, may as well completely skip all this.
 
-		if (PPU.RecomputeClipWindows)
-		{
-			S9xComputeClipWindows();
-			PPU.RecomputeClipWindows = FALSE;
-		}
+               We only did the OBJ because (AFAWK) the RTO flags are
+               updated even during force-blank. */
 
-		if(Settings.SupportHiRes)
-		{
-		if (!IPPU.DoubleWidthPixels && (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.PseudoHires))
-		{
-			register uint32 y;
-			register int x;
-			/* Have to back out of the regular speed hack */
-			for ( y = 0; y < GFX.StartY; y++)
-			{
-				register uint16 *p, *q;
+            if (PPU.RecomputeClipWindows)
+            {
+                S9xComputeClipWindows();
+                PPU.RecomputeClipWindows = FALSE;
+            }
 
-				p = GFX.Screen + y * GFX.PPL + 255;
-				q = GFX.Screen + y * GFX.PPL + 510;
+            if (Settings.SupportHiRes)
+            {
+                if (!IPPU.DoubleWidthPixels && (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.PseudoHires))
+                {
+                    register uint32 y;
+                    register int x;
+                    /* Have to back out of the regular speed hack */
+                    for (y = 0; y < GFX.StartY; y++)
+                    {
+                        register uint16 *p, *q;
 
-				for ( x = 255; x >= 0; x--, p--, q -= 2)
-					*q = *(q + 1) = *p;
-			}
+                        p = GFX.Screen + y * GFX.PPL + 255;
+                        q = GFX.Screen + y * GFX.PPL + 510;
 
-			IPPU.DoubleWidthPixels = TRUE;
-			IPPU.RenderedScreenWidth = 512;
-		}
+                        for (x = 255; x >= 0; x--, p--, q -= 2)
+                            *q = *(q + 1) = *p;
+                    }
 
-		if (!IPPU.DoubleHeightPixels && IPPU.Interlace && (PPU.BGMode == 5 || PPU.BGMode == 6))
-		{
-			register int32 y;
+                    IPPU.DoubleWidthPixels = TRUE;
+                    IPPU.RenderedScreenWidth = 512;
+                }
 
-			IPPU.DoubleHeightPixels = TRUE;
-			IPPU.RenderedScreenHeight = PPU.ScreenHeight << 1;
-			GFX.PPL = GFX.RealPPL << 1;
-			GFX.DoInterlace = 2;
+                if (!IPPU.DoubleHeightPixels && IPPU.Interlace && (PPU.BGMode == 5 || PPU.BGMode == 6))
+                {
+                    register int32 y;
 
-			for ( y = (int32) GFX.StartY - 1; y >= 0; y--)
-				memmove(GFX.Screen + y * GFX.PPL, GFX.Screen + y * GFX.RealPPL, IPPU.RenderedScreenWidth * sizeof(uint16));
-		}
-		}
+                    IPPU.DoubleHeightPixels = TRUE;
+                    IPPU.RenderedScreenHeight = PPU.ScreenHeight << 1;
+                    GFX.PPL = GFX.RealPPL << 1;
+                    GFX.DoInterlace = 2;
 
-		if ((Memory.FillRAM[0x2130] & 0x30) != 0x30 && (Memory.FillRAM[0x2131] & 0x3f))
-			GFX.FixedColour = BUILD_PIXEL(IPPU.XB[PPU.FixedColourRed], IPPU.XB[PPU.FixedColourGreen], IPPU.XB[PPU.FixedColourBlue]);
+                    for (y = (int32)GFX.StartY - 1; y >= 0; y--)
+                        memmove(GFX.Screen + y * GFX.PPL, GFX.Screen + y * GFX.RealPPL, IPPU.RenderedScreenWidth * sizeof(uint16));
+                }
+            }
 
-		if(!PPU.SFXSpeedupHack)
-		{
-			if (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.PseudoHires ||
-					((Memory.FillRAM[0x2130] & 0x30) != 0x30 && (Memory.FillRAM[0x2130] & 2) && (Memory.FillRAM[0x2131] & 0x3f) && (Memory.FillRAM[0x212d] & 0x1f)))
-			{
-				/* If hires (Mode 5/6 or pseudo-hires) or math is to be done
-				   involving the subscreen, then we need to render the subscreen... */
-				RenderScreen(TRUE);
-				if(PPU.RenderSub)
-				{
-					DRAW_BACKDROP_NO_MATH();
-				}
-			}
+            if ((Memory.FillRAM[0x2130] & 0x30) != 0x30 && (Memory.FillRAM[0x2131] & 0x3f))
+                GFX.FixedColour = BUILD_PIXEL(IPPU.XB[PPU.FixedColourRed], IPPU.XB[PPU.FixedColourGreen], IPPU.XB[PPU.FixedColourBlue]);
 
-			RenderScreen(FALSE);
-		}
-		else
-			RenderScreen_SFXSpeedupHack();
-		DrawBackdrop();
-	}
-	else
-	{
-		uint32 l;
-		GFX.S = GFX.Screen + GFX.StartY * GFX.PPL;
-		if (GFX.DoInterlace && GFX.InterlaceFrame)
-			GFX.S += GFX.RealPPL;
+            if (!PPU.SFXSpeedupHack)
+            {
+                if (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.PseudoHires ||
+                    ((Memory.FillRAM[0x2130] & 0x30) != 0x30 && (Memory.FillRAM[0x2130] & 2) && (Memory.FillRAM[0x2131] & 0x3f) && (Memory.FillRAM[0x212d] & 0x1f)))
+                {
+                    /* If hires (Mode 5/6 or pseudo-hires) or math is to be done
+                       involving the subscreen, then we need to render the subscreen... */
+                    RenderScreen(TRUE);
+                    if (PPU.RenderSub)
+                    {
+                        DRAW_BACKDROP_NO_MATH();
+                    }
+                }
 
-		for ( l = GFX.StartY; l <= GFX.EndY; l++, GFX.S += GFX.PPL)
-			memset(GFX.S, 0, IPPU.RenderedScreenWidth * sizeof(int));
-	}
+                RenderScreen(FALSE);
+            }
+            else
+                RenderScreen_SFXSpeedupHack();
+            DrawBackdrop();
+        }
+        else
+        {
+            uint32 l;
+            GFX.S = GFX.Screen + GFX.StartY * GFX.PPL;
+            if (GFX.DoInterlace && GFX.InterlaceFrame)
+                GFX.S += GFX.RealPPL;
+
+            for (l = GFX.StartY; l <= GFX.EndY; l++, GFX.S += GFX.PPL)
+                memset(GFX.S, 0, IPPU.RenderedScreenWidth * sizeof(int));
+        }
+
+        IPPU.RenderedFramesCount++;
+    }
+
+
+    if (++IPPU.FrameCount % Memory.ROMFramesPerSecond == 0)
+    {
+        IPPU.DisplayedRenderedFrameCount = IPPU.RenderedFramesCount;
+        IPPU.RenderedFramesCount = 0;
+        IPPU.FrameCount = 0;
+    }
 
 	IPPU.PreviousLine = IPPU.CurrentLine;
+    IPPU.TotalEmulatedFrames++;
 }
 
 static uint16 get_crosshair_color (uint8 color)
@@ -5350,7 +5364,14 @@ void S9xSoftResetPPU (void)
 	for ( c = 0; c < 256; c++)
 		IPPU.ScreenColors[c] = c;
 	IPPU.RenderedScreenWidth = SNES_WIDTH;
-	IPPU.RenderedScreenHeight = SNES_HEIGHT;
+    IPPU.RenderedScreenHeight = SNES_HEIGHT;
+
+    IPPU.FrameCount = 0;
+    IPPU.RenderedFramesCount = 0;
+    IPPU.DisplayedRenderedFrameCount = 0;
+    IPPU.SkippedFrames = 0;
+    IPPU.FrameSkip = 0;
+    IPPU.RenderThisFrame = TRUE;
 
 	S9xFixColourBrightness();
 
