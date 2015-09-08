@@ -160,6 +160,7 @@ void OnSystemRender(const void *uiobject, const void *item_obj);
 static void OnOptionsChange();
 static void MenuClearScreen();
 static int MenuSaveScreenshot(const char* path);
+static int MenuSaveSequentialScreenshot();
 
 PspUiSplash SplashScreen =
 {
@@ -844,7 +845,7 @@ int OnMenuOk(const void *uimenu, const void* sel_item)
 
         case SYSTEM_SCRNSHOT:
             /* Save screenshot */
-            if (!pl_util_save_image_seq(ScreenshotPath, pl_file_get_filename(GameName), Screen))
+            if (!MenuSaveSequentialScreenshot())
                 pspUiAlert("ERROR: Screenshot not saved");
             else
                 pspUiAlert("Screenshot saved successfully");
@@ -1122,6 +1123,32 @@ void OnOptionsChange()
         TicksPerUpdate = TicksPerSecond / (Options.UpdateFreq / (Options.Frameskip + 1));
         sceRtcGetCurrentTick(&LastTick);
     }
+}
+
+/***
+ * Saves a screenshot in the screenshots directory
+ * according to a sequential file scheme. Not using
+ * psplib4vita's built-in function because it doesn't
+ * correctly support rgb565. Will try to fix that later
+ * and open a pull request.
+ */
+int MenuSaveSequentialScreenshot()
+{
+    // if screenshot path does not exist, create it
+    if (!pl_file_exists(ScreenshotPath))
+        if (!pl_file_mkdir_recursive(ScreenshotPath))
+            return 0;
+
+    // loop until first free screenshot slot is found
+    int i = 0;
+    pl_file_path full_path;
+    do
+    {
+        snprintf(full_path, sizeof(full_path) - 1, "%s%s-%02i.png", ScreenshotPath, pl_file_get_filename(GameName), i);
+    } while (pl_file_exists(full_path) && ++i < 100);
+
+    // save the screenshot
+    return MenuSaveScreenshot(full_path);
 }
 
 /***
