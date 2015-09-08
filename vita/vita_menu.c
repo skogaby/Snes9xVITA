@@ -1145,7 +1145,8 @@ int MenuSaveScreenshot(const char* path)
     }
 
     // correct color, natively SNES renders in RGB565
-    int i, j, r, g, b;
+    int i, j;
+    uint16_t r, g, b;
 
     for (i = copy->Viewport.Y + copy->Viewport.Height; i >= copy->Viewport.Y; i--)
     {
@@ -1154,10 +1155,10 @@ int MenuSaveScreenshot(const char* path)
             uint16_t *pixel = &((uint16_t*)copy->Pixels)[i * copy->Width + j];
 
             r = (*pixel & 0xF800) >> 11;
-            g = (*pixel & 0x07E0) >> 5;
+            g = ((*pixel & 0x07E0) >> 5) * 31 / 63;
             b = (*pixel & 0x001F);
 
-            *pixel = RGB(r, g, b);
+            *pixel = 0x8000 | (b << 10) | (g << 5) | r;
         }
     }
 
