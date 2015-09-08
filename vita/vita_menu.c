@@ -158,8 +158,8 @@ static int OnMenuButtonPress(const struct PspUiMenu *uimenu, pl_menu_item* sel_i
 void OnSystemRender(const void *uiobject, const void *item_obj);
 
 static void OnOptionsChange();
-
-void clear_screen();
+static void MenuClearScreen();
+static int MenuSaveScreenshot(const char* path);
 
 PspUiSplash SplashScreen =
 {
@@ -480,7 +480,7 @@ void DisplayMenu()
         // enter the emulation loop once we're done with the menu
         if (!ExitPSP)
         {
-            clear_screen();
+            MenuClearScreen();
 
             // make sure our emulation environment is setup
             // according to the options
@@ -632,7 +632,7 @@ int OnQuickloadOk(const void *browser, const void *path)
     game.path = GameName;
     game.meta = NULL;
     game.data = NULL;
-    game.size = NULL;
+    game.size = 0;
 
     retro_load_game(&game);
     LoadSRAM();
@@ -659,8 +659,7 @@ int OnSaveStateOk(const void *gallery, const void *item)
 
     if (pl_file_exists(path) && pspUiConfirm("Load state?"))
     {
-        // TODO: make this load the save state
-        if (true) // state_restore(path))
+        if (S9xUnfreezeGame(path))
         {
             ResumeEmulation = 1;
             pl_menu_find_item_by_id(&((const PspUiGallery*)gallery)->Menu, ((const pl_menu_item*)item)->id);
@@ -703,10 +702,12 @@ int OnSaveStateButtonPress(const PspUiGallery *gallery, pl_menu_item *sel, uint3
 
                 pspUiFlashMessage("Saving, please wait...");
 
-                // TODO: make this save the state
-                if (false) // !state_store(path))
+                // first, save the screenshot to the file,
+                // then, append the actual savestate data to the 
+                // end of the same file
+                if (!MenuSaveScreenshot(path) || !S9xFreezeGame(path))
                 {
-                    pspUiAlert("ERROR: State not saved");
+                    pspUiAlert("ERROR: Couldn't save savestate");
                     break;
                 }
 
@@ -842,7 +843,6 @@ int OnMenuOk(const void *uimenu, const void* sel_item)
             break;
 
         case SYSTEM_SCRNSHOT:
-            // TODO
             /* Save screenshot */
             if (!pl_util_save_image_seq(ScreenshotPath, pl_file_get_filename(GameName), Screen))
                 pspUiAlert("ERROR: Screenshot not saved");
@@ -1023,10 +1023,10 @@ static void DisplayStateTab()
 void OnSystemRender(const void *uiobject, const void *item_obj)
 {
     int w, h, x, y;
-    w = 256;
-    h = 224;
-    x = SCREEN_W - w - 16;
-    y = SCREEN_H - h - 80;
+    w = SNES_WIDTH;
+    h = SNES_HEIGHT;
+    x = SCREEN_W - w - 45;
+    y = SCREEN_H - h - 45;
 
     /* Draw a small representation of the screen */
     pspVideoShadowRect(x, y, x + w - 1, y + h - 1, PSP_COLOR_BLACK, 3);
@@ -1080,7 +1080,7 @@ const char* S9xGetDirectory(uint32_t dirtype)
 /***
  * Clears the screen...
  */
-void clear_screen()
+void MenuClearScreen()
 {
     vita2d_start_drawing();
     vita2d_clear_screen();
@@ -1122,4 +1122,56 @@ void OnOptionsChange()
         TicksPerUpdate = TicksPerSecond / (Options.UpdateFreq / (Options.Frameskip + 1));
         sceRtcGetCurrentTick(&LastTick);
     }
+}
+
+/***
+ * Saves a screenshot to the given filepath.
+ */
+int MenuSaveScreenshot(const char* path)
+{
+    // open file for writing
+    FILE *f;
+    if (!(f = fopen(path, "w"))) 
+        return 0;
+
+    // create copy of screen
+    PspImage *copy;
+
+    if (!(copy = pspImageCreateCopy(Screen)))
+    {
+        fclose(f);
+
+        return 0;
+    }
+
+    // correct color, natively SNES renders in RGB565
+    int i, j, r, g, b;
+
+    for (i = copy->Viewport.Y + copy->Viewport.Height; i >= copy->Viewport.Y; i--)
+    {
+        for (j = copy->Viewport.X + copy->Viewport.Width; j >= copy->Viewport.X; j--)
+        {
+            uint16_t *pixel = &((uint16_t*)copy->Pixels)[i * copy->Width + j];
+
+            r = (*pixel & 0xF800) >> 11;
+            g = (*pixel & 0x07E0) >> 5;
+            b = (*pixel & 0x001F);
+
+            *pixel = RGB(r, g, b);
+        }
+    }
+
+    /* Write the screenshot */
+    if (!pspImageSavePngFd(f, copy))
+    {
+        fclose(f);
+        pspImageDestroy(copy);
+
+        return 0;
+    }
+
+    fclose(f);
+    pspImageDestroy(copy);
+
+    return 1;
 }

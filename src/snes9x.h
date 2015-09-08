@@ -204,6 +204,7 @@ extern "C" {
   * the whole source or go through the file system every time 
   * we want to do something. */
 
+#ifndef VITA
 #define STREAM memstream_t *
 #define READ_STREAM(p, l, s)     memstream_read(s, p, l)
 #define WRITE_STREAM(p, l, s)    memstream_write(s, p, l)
@@ -213,6 +214,17 @@ extern "C" {
 #define FIND_STREAM(f)           memstream_pos(f)
 #define REVERT_STREAM(f, o, s)   memstream_seek(f, o, s)
 #define CLOSE_STREAM(s)          memstream_close(s)
+#else
+#define STREAM FILE *
+#define READ_STREAM(p, l, s)    fread(p, 1, l, s)
+#define WRITE_STREAM(p, l, s)   fwrite(p, 1, l, s)
+#define OPEN_STREAM(f, m)       fopen(f, m)
+#define CLOSE_STREAM(s)         fclose(s)
+#define GETS_STREAM(p, l, s)    fgets(p, l, s)
+#define GETC_STREAM(s)          fgetc(s)
+#define FIND_STREAM(f)          ftell(f)
+#define REVERT_STREAM(f, o, s)  fseek(f, o, s)
+#endif
 
 #define SNES_WIDTH		256
 #define SNES_HEIGHT		224

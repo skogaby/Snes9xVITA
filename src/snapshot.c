@@ -1290,6 +1290,7 @@ void S9xFreezeToStream (STREAM stream)
 	FreezeBlock (stream, "FIL", Memory.FillRAM, 0x8000);
 
 	S9xAPUSaveState(soundsnapshot);
+
 	FreezeBlock (stream, "SND", soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
 
 	S9xControlPreSaveState(&ctl_snap);
@@ -1353,10 +1354,9 @@ void S9xFreezeToStream (STREAM stream)
 bool8 S9xFreezeGame (const char *filename)
 {
 	STREAM	stream;
-
 	stream = NULL;
 
-	if (S9xOpenSnapshotFile(filename, "wb", &stream))
+	if (S9xOpenSnapshotFile(filename, "ab", &stream))
 	{
 		S9xFreezeToStream(stream);
 		CLOSE_STREAM(stream);
@@ -1387,10 +1387,6 @@ bool8 S9xUnfreezeGame (const char * filename)
 
 	return (FALSE);
 }
-
-
-
-
 
 static int UnfreezeBlock (STREAM stream, const char *name, uint8 *block, int size)
 {

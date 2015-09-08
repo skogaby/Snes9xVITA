@@ -85,7 +85,7 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
             Screen->PowerOfTwo = (i == width);
         Screen->BytesPerPixel = 2;
         Screen->FreeBuffer = 0;
-        Screen->Depth = 2;
+        Screen->Depth = 16;
     }
 
 	// copy the input pixels into the output buffer
