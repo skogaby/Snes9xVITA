@@ -189,6 +189,8 @@
 #include "controls.h"
 #include "display.h"
 
+#include <psplib/image.h>
+
 #ifndef min
 #define min(a,b)	(((a) < (b)) ? (a) : (b))
 #endif
@@ -1369,15 +1371,17 @@ bool8 S9xFreezeGame (const char *filename)
 
 bool8 S9xUnfreezeGame (const char * filename)
 {
-	STREAM	stream;
-	char	drive[_MAX_DRIVE + 1], dir[PATH_MAX + 1], def[PATH_MAX + 1], ext[PATH_MAX + 1];
-
+	STREAM stream;
 	stream = NULL;
-
-	_splitpath(filename, drive, dir, def, ext);
 
 	if (S9xOpenSnapshotFile(filename, "rb", &stream))
 	{
+        /* In our implementation, save states are prepended
+        by a PNG screenshot -- skip over the PNG */
+        PspImage *image = pspImageLoadPngFd(stream);
+        pspImageDestroy(image);
+
+        // now load the actual save data
 		int result = S9xUnfreezeFromStream(stream);
 		CLOSE_STREAM(stream);
 
