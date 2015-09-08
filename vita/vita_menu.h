@@ -103,7 +103,7 @@ extern struct ButtonConfig ActiveConfig;
 extern struct ButtonConfig DefaultConfig;
 extern unsigned int PhysicalButtonMap[MAP_BUTTONS];
 extern int OptionsChanged;
-extern PspImage *Screen;
+extern PspImage *Screen; 
 
 int  InitMenu();
 void DisplayMenu();

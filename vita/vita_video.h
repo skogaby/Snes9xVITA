@@ -21,6 +21,7 @@
 #include "../libretro/libretro.h"
 
 extern unsigned long curr_frame;
+extern float curr_fps;
 extern float scale_x, scale_y;
 extern vita2d_texture *tex;
 

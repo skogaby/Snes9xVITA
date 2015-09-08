@@ -32,6 +32,7 @@ static int TicksPerUpdate;
 static uint32_t TicksPerSecond;
 static uint64_t LastTick;
 static uint64_t CurrentTick;
+static pl_perf_counter FpsCounter;
 
 /* Define various menu options */
 PL_MENU_OPTIONS_BEGIN(ToggleOptions)
@@ -274,6 +275,7 @@ int InitMenu()
     Background = NULL;
     GameName[0] = '\0';
     OptionsChanged = false;
+    pl_perf_init_counter(&FpsCounter);
 
     /* Initialize paths */
     sprintf(SaveStatePath, "%ssavedata/", pl_psp_get_app_directory());
@@ -490,6 +492,7 @@ void DisplayMenu()
             while(ResumeEmulation)
             { 
                 // run one frame of the emulator
+                curr_fps = pl_perf_update_counter(&FpsCounter);
                 retro_run();
 
                 // wait if needed 

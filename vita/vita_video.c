@@ -5,12 +5,12 @@
 
 // helpers for rendering
 unsigned long curr_frame;
+float curr_fps;
 float scale_x, scale_y;
 int pos_x, pos_y;
 unsigned short h, w;
 vita2d_texture *tex;
 void *tex_data;
-pl_perf_counter FpsCounter;
 PspImage *Screen;
 
 /***
@@ -48,6 +48,7 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
         }
 
 		curr_frame = 0;
+        curr_fps = 0.0f;
 		pos_x = (SCREEN_W / 2) - (width / 2) * scale_x;
 		pos_y = (SCREEN_H / 2) - (height / 2) * scale_y;
 	}
@@ -57,7 +58,6 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
     {
         tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
         tex_data = vita2d_texture_get_datap(tex);
-        pl_perf_init_counter(&FpsCounter);
 
         // initialize PSPImage
         if (Screen)
@@ -117,7 +117,7 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
 void show_fps()
 {
     static char fps_display[32];
-    sprintf(fps_display, "FPS: %3.02f", pl_perf_update_counter(&FpsCounter));
+    sprintf(fps_display, "FPS: %3.02f", curr_fps);
 
     int width = pspFontGetTextWidth(&PspStockFont, fps_display);
     int height = pspFontGetLineHeight(&PspStockFont);
