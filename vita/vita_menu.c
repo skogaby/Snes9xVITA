@@ -1123,7 +1123,7 @@ void OnOptionsChange()
 
     if (Options.UpdateFreq)
     {
-        TicksPerUpdate = TicksPerSecond / (Options.UpdateFreq / (Options.Frameskip + 1));
+        TicksPerUpdate = TicksPerSecond / Options.UpdateFreq;
         sceRtcGetCurrentTick(&LastTick);
     }
 }
