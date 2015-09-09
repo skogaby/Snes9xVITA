@@ -27,6 +27,8 @@
 #include "../src/cheats.h"
 #include "../src/display.h"
 
+#include "../vita/vita_menu.h"
+
 #define LR_MAP_BUTTON(id, name) S9xMapButton((id), S9xGetCommandT((name)))
 #define MAKE_BUTTON(pad, btn) (((pad)<<4)|(btn))
 
@@ -183,13 +185,17 @@ void retro_get_system_info(struct retro_system_info *info)
 
 static void S9xAudioCallback()
 {
-   size_t avail;
-   static int16_t audio_buf[1060];//0x10000];
+    size_t avail;
+    static int16_t audio_buf[1060];//0x10000];
 
-   S9xFinalizeSamples();
-   avail = S9xGetSampleCount();
-   S9xMixSamples(audio_buf, avail);
-   audio_batch_cb(audio_buf, avail >> 1);
+    S9xFinalizeSamples();
+    avail = S9xGetSampleCount();
+    S9xMixSamples(audio_buf, avail);
+
+    if (Options.EmulateSound)
+    {
+        audio_batch_cb(audio_buf, avail >> 1);
+    }
 }
 
 static unsigned retro_devices[2];
