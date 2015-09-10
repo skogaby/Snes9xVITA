@@ -712,7 +712,7 @@ static bool merge_mapping(void)
 		return false;//can't merge the only one
 	a= &memorydesc[MAX_MAPS - (memorydesc_c-1)];
 	b= &memorydesc[MAX_MAPS - memorydesc_c];
-//printf("test %x/%x\n",a->start,b->start);
+
 	if (a->flags != b->flags)
 		return false;
 	if (a->disconnect != b->disconnect)
@@ -723,7 +723,6 @@ static bool merge_mapping(void)
 		return false;//we don't use these
 	if (((char*)a->ptr)+a->offset==((char*)b->ptr)+b->offset && a->select==b->select)
 	{
-//printf("merge/mirror\n");
 		a->select&=~(a->start^b->start);
 		memorydesc_c--;
 		return true;
@@ -733,13 +732,12 @@ static bool merge_mapping(void)
 		len=(0x1000000 - a->select);
 	if (len && ((len-1) & (len | a->disconnect))==0 && ((char*)a->ptr)+a->offset+len == ((char*)b->ptr)+b->offset)
 	{
-//printf("merge/consec\n");
 		a->select &=~ len;
 		a->disconnect &=~ len;
 		memorydesc_c--;
 		return true;
 	}
-//printf("nomerge\n");
+
 	return false;
 }
 
@@ -838,12 +836,7 @@ bool retro_load_game(const struct retro_game_info *game)
 
    if (!loaded)
    {
-      printf("ROM loading failed");
       return FALSE;
-   }
-   else
-   {
-	   printf("ROM file loaded successfully");
    }
 
    check_variables();

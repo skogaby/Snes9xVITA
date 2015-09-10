@@ -775,12 +775,12 @@ static uint32 FileLoader (uint8 *buffer, const char *filename, int32 maxsize)
 
 	if (!(fd = sceIoOpen(filename, PSP2_O_RDONLY, 0777))) 
 	{
-		printf("Couldn't get a file handle for the ROM");
+		// printf("Couldn't get a file handle for the ROM");
 		return 0;
 	}
 	else
 	{
-		printf("Successfully got file handle to the ROM");
+		// printf("Successfully got file handle to the ROM");
 	}
 
 	strcpy(Memory.ROMFilename, fname);
@@ -863,12 +863,12 @@ again:
 	Memory.ExtendedFormat = NOPE;
 
 	totalFileSize = FileLoader(Memory.ROM, filename, MAX_ROM_SIZE);
-	printf("FileLoader called successfully!");
+	// printf("FileLoader called successfully!");
 
 	if (!totalFileSize)
 		return FALSE;
 
-	printf("Total file size: %ld", (long)totalFileSize);
+	// printf("Total file size: %ld", (long)totalFileSize);
 
 	hi_score = ScoreHiROM(Memory.CalculatedSize, Memory.ROM, FALSE, 0);
 	lo_score = ScoreLoROM(Memory.CalculatedSize, Memory.ROM, FALSE, 0);
@@ -1061,16 +1061,16 @@ again:
 
 	S9xLoadCheatFile(S9xGetFilename(".cht", CHEAT_DIR));
 
-	printf("Trying to InitROM()");
+	// printf("Trying to InitROM()");
 	InitROM();
-	printf("InitROM() successful");
+	// printf("InitROM() successful");
 
 	S9xInitCheatData();
 	S9xApplyCheats();
-	printf("Cheats applied!");
+	// printf("Cheats applied!");
 
 	S9xReset();
-	printf("System reset complete!");
+	// printf("System reset complete!");
 
     return (TRUE);
 }
@@ -2538,7 +2538,6 @@ void InitROM (void)
 	}
 
 	/* Initialize emulation */
-	printf("Initializing emulation");
 	Timings.H_Max_Master = SNES_CYCLES_PER_SCANLINE;
 	Timings.H_Max        = Timings.H_Max_Master;
 	Timings.HBlankStart  = SNES_HBLANK_START_HC;

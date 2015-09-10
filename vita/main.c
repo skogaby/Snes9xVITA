@@ -38,15 +38,11 @@ int main()
  */
 void setup_callbacks()
 {
-    printf("Setting up libretro callbacks...");
-
     retro_set_environment(&retro_environment_callback);
     retro_set_video_refresh(&retro_video_refresh_callback);
     retro_set_input_poll(&retro_input_poll_callback);
     retro_set_input_state(&retro_input_state_callback);
     retro_set_audio_sample_batch(&retro_audio_sample_batch_callback);
-
-    printf("Libretro callbacks created successfully!");
 }
 
 /***

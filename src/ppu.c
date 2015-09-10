@@ -222,15 +222,15 @@ bool8 S9xGraphicsInit (void)
 	GFX.ScreenSize = GFX.Pitch / 2 * SNES_HEIGHT_EXTENDED * 1;
 #endif
 	GFX.SubScreen  = (uint16 *) malloc(GFX.ScreenSize * sizeof(uint16));
-	printf("Allocating GFX.ZBuffer and GFX.SubZBuffer to ScreenSize %i bytes", GFX.ScreenSize);
+	// printf("Allocating GFX.ZBuffer and GFX.SubZBuffer to ScreenSize %i bytes", GFX.ScreenSize);
 	GFX.ZBuffer    = (uint8 *)  malloc(GFX.ScreenSize);
 	GFX.SubZBuffer = (uint8 *)  malloc(GFX.ScreenSize);
-	printf("Done allocating GFX.ZBuffer and GFX.SubZBuffer");
+	// printf("Done allocating GFX.ZBuffer and GFX.SubZBuffer");
 
 	if (!GFX.X2 || !GFX.ZERO || !GFX.SubScreen || !GFX.ZBuffer || !GFX.SubZBuffer)
 	{
-		printf("X2: %p -- ZERO: %p -- SubScreen: %p -- ZBuffer: %p -- SubZBuffer: %p", 
-			(void *)GFX.X2, (void *)GFX.ZERO, (void *)GFX.SubScreen, (void *)GFX.ZBuffer, (void *)GFX.SubZBuffer);
+		// printf("X2: %p -- ZERO: %p -- SubScreen: %p -- ZBuffer: %p -- SubZBuffer: %p", 
+		//	(void *)GFX.X2, (void *)GFX.ZERO, (void *)GFX.SubScreen, (void *)GFX.ZBuffer, (void *)GFX.SubZBuffer);
 		S9xGraphicsDeinit();
 		return (FALSE);
 	}

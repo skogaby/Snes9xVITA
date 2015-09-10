@@ -10,8 +10,6 @@ void handle_button_press(unsigned int mapping, unsigned int pressed);
  */
 void setup_input()
 {
-	printf("Setting up input data");
-
 	pad = (SceCtrlData*)malloc(sizeof(SceCtrlData));
 	keymap = (uint32_t*)malloc(sizeof(uint32_t) * 12);
 
@@ -21,10 +19,6 @@ void setup_input()
     {
         printf("Unable to allocate memory for input data. Bailing.");
         sceKernelExitProcess(0);
-    }
-    else
-    {
-	    printf("Input data initialized");
     }
 }
 

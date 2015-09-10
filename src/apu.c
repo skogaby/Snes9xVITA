@@ -3381,8 +3381,6 @@ bool8 S9xInitSound (int buffer_ms, int lag_ms)
 	buffer_size <<= 1;
 	buffer_size <<= 1;
 
-	printf("Sound buffer size: %d (%d samples)\n", buffer_size, sample_count);
-
 	if (landing_buffer)
 		free(landing_buffer);
 	landing_buffer = (short*)malloc(buffer_size * 2);
@@ -3554,8 +3552,8 @@ void S9xAPUExecute (void)
 
 void S9xAPUTimingSetSpeedup (int ticks)
 {
-	if (ticks != 0)
-		printf("APU speedup hack: %d\n", ticks);
+	// if (ticks != 0)
+	// 	printf("APU speedup hack: %d\n", ticks);
 
 	timing_hack_denominator = TEMPO_UNIT - ticks;
 	spc_set_tempo(timing_hack_denominator);
