@@ -15,6 +15,7 @@
 #include <psp2/moduleinfo.h>
 #include <psp2/types.h>
 
+#include "revitalize.h"
 #include "utils.h"
 #include "vita_input.h"
 #include "vita_audio.h"
@@ -34,6 +35,7 @@ const char* S9xGetDirectory(uint32_t dirtype);
 void load_rom();
 void vita_cleanup();
 void setup_callbacks();
+void show_splash();
 
 // our collection of callbacks to plug in to libretro
 int retro_environment_callback(unsigned cmd, void *data);

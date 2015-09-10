@@ -19,6 +19,8 @@ int main()
 
     pl_psp_init("cache0:/Snes9xVITA/");
 
+    show_splash();
+
     // get the game ready
     if (InitMenu())
     {
@@ -31,6 +33,26 @@ int main()
 
     sceKernelExitProcess(0);
     return 0;
+}
+
+/***
+ * Displays the Revitalize Competition splash screen for 5 seconds
+ */
+void show_splash()
+{
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+
+    vita2d_texture *splash = vita2d_create_empty_texture(SCREEN_W, SCREEN_H);
+    splash = vita2d_load_PNG_buffer(revitalize);
+
+    vita2d_draw_texture(splash, 0, 0);
+
+    vita2d_end_drawing();
+    vita2d_swap_buffers();
+
+    sceKernelDelayThread(5000000); // Delay 5 seconds
+    vita2d_free_texture(splash);
 }
 
 /***
