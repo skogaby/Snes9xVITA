@@ -914,7 +914,7 @@ static int LoadButtonConfig()
     int nread = sceIoRead(file, &ActiveConfig, sizeof(struct ButtonConfig));
     sceIoClose(file);
 
-    if (nread != 1)
+    if (nread <= 0)
     {
         InitButtonConfig();
         return 0;
@@ -945,7 +945,7 @@ static int SaveButtonConfig()
     int nwritten = sceIoWrite(file, &ActiveConfig, sizeof(struct ButtonConfig));
     sceIoClose(file);
 
-    return (nwritten == 1);
+    return nwritten;
 }
 
 /* Load state icon */
