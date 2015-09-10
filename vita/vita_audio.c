@@ -9,6 +9,8 @@
  */
 size_t retro_audio_sample_batch_callback(const int16_t *data, size_t frames)
 {
+    sceKernelLockMutex(audio_mutex, 1, NULL);
+
 	// make sure we don't overbuffer
     if (frames + curr_buffer_frames > AUDIO_SAMPLE_COUNT * 2)
     {
@@ -19,6 +21,7 @@ size_t retro_audio_sample_batch_callback(const int16_t *data, size_t frames)
     memcpy(&retro_audio_callback_buffer[curr_buffer_frames * 2], data, frames * 2 * sizeof(int16_t));
     curr_buffer_frames += frames;
 
+    sceKernelUnlockMutex(audio_mutex, 1);
     return frames;
 }
 
@@ -30,6 +33,8 @@ int audio_callback(void *buffer, unsigned int *length, void *userdata)
     int i;
     int len = *length;
 
+    sceKernelLockMutex(audio_mutex, 1, NULL);
+
     // see if we've buffered enough frames
     if (len <= curr_buffer_frames)
     {
@@ -37,10 +42,12 @@ int audio_callback(void *buffer, unsigned int *length, void *userdata)
         curr_buffer_frames -= len;
         memmove(&retro_audio_callback_buffer[0], &retro_audio_callback_buffer[len * 2], sizeof(int16_t) * 2 * curr_buffer_frames);
 
+        sceKernelUnlockMutex(audio_mutex, 1);
         return len;
     }
     else
     {
+        sceKernelUnlockMutex(audio_mutex, 1);
         return 0;
     }
 }
@@ -177,6 +184,9 @@ int setup_audio()
     // setup our callbacks
     set_audio_channel_callback(0, audio_callback, 0);
 
+    // initialize the audio buffer mutex
+    audio_mutex = sceKernelCreateMutex("AudioMutex", 0, 1, 0);
+
     return AUDIO_SAMPLE_COUNT;
 }
 
@@ -208,6 +218,7 @@ void audio_shutdown()
     }
 
     free_buffers();
+    sceKernelDeleteMutex(audio_mutex);
 }
 
 /***

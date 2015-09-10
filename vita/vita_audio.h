@@ -39,6 +39,10 @@ typedef struct {
     void *Userdata;
 } ChannelInfo;
 
+// maintain concurrency between the thread that's buffering audio
+// data and the thread that's playing it
+static SceUID audio_mutex;
+
 // keep track of our current audio frame buffer and its length
 // (the data received in the libretro audio callback)
 static unsigned int curr_buffer_frames;
