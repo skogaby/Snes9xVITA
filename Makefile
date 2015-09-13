@@ -12,8 +12,8 @@ INCLUDES = -I$(LIBRETRO) -I$(CORE) -I$(VITA)
 BUILD_APP = $(CORE)/apu.o $(CORE)/bsx.o $(CORE)/c4emu.o $(CORE)/cheats.o $(CORE)/controls.o $(CORE)/cpu.o $(CORE)/cpuexec.o \
 	        $(CORE)/dsp.o $(CORE)/fxemu.o $(CORE)/globals.o $(CORE)/memmap.o $(CORE)/obc1.o $(CORE)/ppu.o $(CORE)/sa1.o \
 	        $(CORE)/sdd1.o $(CORE)/seta.o $(CORE)/snapshot.o $(CORE)/spc7110.o $(CORE)/srtc.o $(CORE)/tile.o
-BUILD_PORT = $(LIBRETRO)/libretro.o $(LIBRETRO)/memory_stream.o $(VITA)/font_data.o $(VITA)/font.o \
-             $(VITA)/utils.o $(VITA)/vita_input.o $(VITA)/vita_audio.o $(VITA)/vita_video.o $(VITA)/vita_menu.o $(VITA)/main.o
+BUILD_PORT = $(LIBRETRO)/libretro.o $(LIBRETRO)/memory_stream.o $(VITA)/utils.o $(VITA)/vita_input.o $(VITA)/vita_audio.o \
+             $(VITA)/vita_video.o $(VITA)/vita_menu.o $(VITA)/main.o
 
 OBJS = $(BUILD_APP) $(BUILD_PORT)
 

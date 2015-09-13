@@ -21,17 +21,46 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
 {
 	curr_frame++;
 
+    // initialize our main render texture once we get the dimensions for the first time
+    if (!tex)
+    {
+        tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
+        tex_data = vita2d_texture_get_datap(tex);
+
+        // initialize PSPImage
+        if (Screen)
+            free(Screen);
+        int size = width * height * 2;
+
+        Screen = (PspImage*)malloc(sizeof(PspImage));
+
+        Screen->TextureFormat = SCE_GXM_TEXTURE_FORMAT_R5G6B5;
+        Screen->PalSize = (unsigned short)0;
+        memset(tex_data, 0, size);
+
+        Screen->Width = width;
+        Screen->Height = height;
+        Screen->Pixels = tex_data;
+        Screen->Texture = tex;
+
+        Screen->Viewport.X = 0;
+        Screen->Viewport.Y = 0;
+        Screen->Viewport.Width = width;
+        Screen->Viewport.Height = height;
+
+        int i;
+        for (i = 1; i < width; i *= 2);
+            Screen->PowerOfTwo = (i == width);
+        Screen->BytesPerPixel = 2;
+        Screen->FreeBuffer = 0;
+        Screen->Depth = 16;
+    }
+
     // initialize our render variables if they're uninitalized, or
     // if they've changed due to user action
 	if(OptionsChanged)
 	{
         OptionsChanged = false;
-
-        if (!tex)
-        {
-            tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
-            tex_data = vita2d_texture_get_datap(tex);
-        }
 
 		// handle changes to scale from the options
         switch (Options.DisplayMode)
@@ -65,38 +94,6 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
         sceGxmTextureSetMinFilter(&(tex->gxm_tex), tex_filter);
         sceGxmTextureSetMagFilter(&(tex->gxm_tex), tex_filter);
 	}
-
-    // initialize our main render texture once we get the dimensions for the first time
-    if (!tex)
-    {
-        // initialize PSPImage
-        if (Screen)
-            free(Screen);
-        int size = width * height * 2;
-
-        Screen = (PspImage*)malloc(sizeof(PspImage));
-
-        Screen->TextureFormat = SCE_GXM_TEXTURE_FORMAT_R5G6B5;
-        Screen->PalSize = (unsigned short)0;
-        memset(tex_data, 0, size);
-
-        Screen->Width = width;
-        Screen->Height = height;
-        Screen->Pixels = tex_data;
-        Screen->Texture = tex;
-
-        Screen->Viewport.X = 0;
-        Screen->Viewport.Y = 0;
-        Screen->Viewport.Width = width;
-        Screen->Viewport.Height = height;
-
-        int i;
-        for (i = 1; i < width; i *= 2);
-            Screen->PowerOfTwo = (i == width);
-        Screen->BytesPerPixel = 2;
-        Screen->FreeBuffer = 0;
-        Screen->Depth = 16;
-    }
 
 	// copy the input pixels into the output buffer
 	const uint16_t* in_pixels = (const uint16_t*)data;
