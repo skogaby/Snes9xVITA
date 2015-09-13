@@ -37,21 +37,22 @@
 #define TAB_ABOUT     5
 #define TAB_MAX       TAB_SYSTEM
 
-#define OPTION_DISPLAY_MODE  1
-#define OPTION_EMULATE_SOUND 2
-#define OPTION_SYNC_FREQ     3
-#define OPTION_FRAMESKIP     4
-#define OPTION_VSYNC         5
-#define OPTION_CLOCK_FREQ    6
-#define OPTION_SHOW_FPS      7
-#define OPTION_CONTROL_MODE  8
-#define OPTION_ANIMATE       9
+#define OPTION_DISPLAY_MODE    1
+#define OPTION_TEXTURE_FILTER  2
+#define OPTION_EMULATE_SOUND   3
+#define OPTION_SYNC_FREQ       4
+#define OPTION_FRAMESKIP       5
+#define OPTION_VSYNC           6
+#define OPTION_CLOCK_FREQ      7
+#define OPTION_SHOW_FPS        8
+#define OPTION_CONTROL_MODE    9
+#define OPTION_ANIMATE         10
 
-#define SYSTEM_RESET         1
-#define SYSTEM_SCRNSHOT      2
+#define SYSTEM_RESET           1
+#define SYSTEM_SCRNSHOT        2
 
 #define DISPLAY_MODE_UNSCALED    0
-#define DISPLAY_MODE_2X 1
+#define DISPLAY_MODE_2X          1
 #define DISPLAY_MODE_FIT_HEIGHT  2
 #define DISPLAY_MODE_FILL_SCREEN 3
 
@@ -91,6 +92,7 @@ typedef struct
     int UpdateFreq;
     int Frameskip;
     int EmulateSound;
+    int TextureFilter;
 } EmulatorOptions;
 
 struct ButtonConfig

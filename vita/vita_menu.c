@@ -90,6 +90,7 @@ PL_MENU_OPTIONS_END
 PL_MENU_ITEMS_BEGIN(OptionMenuDef)
     PL_MENU_HEADER("Video")
         PL_MENU_ITEM("Screen size", OPTION_DISPLAY_MODE, ScreenSizeOptions, "\026\250\020 Change screen size")
+        PL_MENU_ITEM("Screen smoothing", OPTION_TEXTURE_FILTER, ToggleOptions,"\026\250\020 Enable/disable screen smoothing")
     PL_MENU_HEADER("Audio")
         PL_MENU_ITEM("Enable sound", OPTION_EMULATE_SOUND, ToggleOptions, "\026\001\020 Enable/disable sound")
     PL_MENU_HEADER("Performance")
@@ -372,17 +373,18 @@ void LoadOptions()
     pl_ini_load(&init, path);
 
     /* Load values */
-    Options.DisplayMode  = pl_ini_get_int(&init, "Video", "Display Mode", DISPLAY_MODE_UNSCALED);
-    Options.UpdateFreq   = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
-    Options.Frameskip    = pl_ini_get_int(&init, "Video", "Frameskip", 1);
-    Options.VSync        = pl_ini_get_int(&init, "Video", "VSync", 1);
-    Options.ClockFreq    = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
-    Options.ShowFps      = pl_ini_get_int(&init, "Video", "Show FPS", 0);
+    Options.DisplayMode   = pl_ini_get_int(&init, "Video", "Display Mode", DISPLAY_MODE_UNSCALED);
+    Options.TextureFilter = pl_ini_get_int(&init, "Video", "Screen smoothing", 0);
+    Options.UpdateFreq    = pl_ini_get_int(&init, "Video", "Update Frequency", 0);
+    Options.Frameskip     = pl_ini_get_int(&init, "Video", "Frameskip", 1);
+    Options.VSync         = pl_ini_get_int(&init, "Video", "VSync", 1);
+    Options.ClockFreq     = pl_ini_get_int(&init, "Video", "PSP Clock Frequency", 333);
+    Options.ShowFps       = pl_ini_get_int(&init, "Video", "Show FPS", 0);
 
-    Options.ControlMode  = pl_ini_get_int(&init, "Menu", "Control Mode", 0);
-    UiMetric.Animate     = pl_ini_get_int(&init, "Menu", "Animate", 1);
+    Options.ControlMode   = pl_ini_get_int(&init, "Menu", "Control Mode", 0);
+    UiMetric.Animate      = pl_ini_get_int(&init, "Menu", "Animate", 1);
 
-    Options.EmulateSound = pl_ini_get_int(&init, "Audio", "Emulate Sound", 1);
+    Options.EmulateSound  = pl_ini_get_int(&init, "Audio", "Emulate Sound", 1);
 
     /* Clean up */
     pl_ini_destroy(&init);
@@ -400,6 +402,7 @@ int SaveOptions()
 
     /* Set values */
     pl_ini_set_int(&init, "Video", "Display Mode", Options.DisplayMode);
+    pl_ini_set_int(&init, "Video", "Screen smoothing", Options.TextureFilter);
     pl_ini_set_int(&init, "Video", "Update Frequency", Options.UpdateFreq);
     pl_ini_set_int(&init, "Video", "Frameskip", Options.Frameskip);
     pl_ini_set_int(&init, "Video", "VSync", Options.VSync);
@@ -450,6 +453,8 @@ void DisplayMenu()
             /* Init menu options */
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_DISPLAY_MODE);
             pl_menu_select_option_by_value(item, (void*)Options.DisplayMode);
+            item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_TEXTURE_FILTER);
+            pl_menu_select_option_by_value(item, (void*)Options.TextureFilter);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_EMULATE_SOUND);
             pl_menu_select_option_by_value(item, (void*)Options.EmulateSound);
             item = pl_menu_find_item_by_id(&OptionUiMenu.Menu, OPTION_SYNC_FREQ);
@@ -785,6 +790,9 @@ int OnMenuItemChanged(const struct PspUiMenu *uimenu, pl_menu_item* item, const 
         {
         case OPTION_DISPLAY_MODE:
             Options.DisplayMode = value;
+            break;
+        case OPTION_TEXTURE_FILTER:
+            Options.TextureFilter = value;
             break;
         case OPTION_EMULATE_SOUND:
             Options.EmulateSound = value;

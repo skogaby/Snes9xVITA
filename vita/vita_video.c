@@ -12,6 +12,7 @@ unsigned short h, w;
 vita2d_texture *tex;
 void *tex_data;
 PspImage *Screen;
+SceGxmTextureFilter tex_filter;
 
 /***
  * Callback for when a new frame is generated that we need to render.
@@ -22,9 +23,15 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
 
     // initialize our render variables if they're uninitalized, or
     // if they've changed due to user action
-	if(!tex || OptionsChanged)
+	if(OptionsChanged)
 	{
         OptionsChanged = false;
+
+        if (!tex)
+        {
+            tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
+            tex_data = vita2d_texture_get_datap(tex);
+        }
 
 		// handle changes to scale from the options
         switch (Options.DisplayMode)
@@ -51,14 +58,17 @@ bool retro_video_refresh_callback(const void *data, unsigned width, unsigned hei
         curr_fps = 0.0f;
 		pos_x = (SCREEN_W / 2) - (width / 2) * scale_x;
 		pos_y = (SCREEN_H / 2) - (height / 2) * scale_y;
+
+        // handle texture filtering options
+        tex_filter = Options.TextureFilter ? SCE_GXM_TEXTURE_FILTER_LINEAR : SCE_GXM_TEXTURE_FILTER_POINT;
+
+        sceGxmTextureSetMinFilter(&(tex->gxm_tex), tex_filter);
+        sceGxmTextureSetMagFilter(&(tex->gxm_tex), tex_filter);
 	}
 
     // initialize our main render texture once we get the dimensions for the first time
     if (!tex)
     {
-        tex = vita2d_create_empty_texture_format(width, height, SCE_GXM_TEXTURE_FORMAT_R5G6B5);
-        tex_data = vita2d_texture_get_datap(tex);
-
         // initialize PSPImage
         if (Screen)
             free(Screen);
