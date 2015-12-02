@@ -98,7 +98,7 @@ int setup_audio()
     /* Initialize channels */
     for (i = 0, failed = 0; i < AUDIO_CHANNELS; i++)
     {
-        audio_status[i].Handle = sceAudioOutOpenPort(PSP2_AUDIO_OUT_PORT_TYPE_VOICE, AUDIO_SAMPLE_COUNT, AUDIO_OUTPUT_RATE, PSP2_AUDIO_OUT_MODE_STEREO);
+        audio_status[i].Handle = sceAudioOutOpenPort(SCE_AUDIO_OUT_PORT_TYPE_VOICE, AUDIO_SAMPLE_COUNT, AUDIO_OUTPUT_RATE, SCE_AUDIO_OUT_MODE_STEREO);
 
         if (audio_status[i].Handle < 0)
         {
@@ -288,7 +288,7 @@ static int output_audio_blocking(unsigned int channel, unsigned int vol1, unsign
 
     int vols[2] = { vol1, vol2 };
     sceAudioOutSetConfig(audio_status[channel].Handle, length, -1, -1);
-    sceAudioOutSetVolume(audio_status[channel].Handle, PSP2_AUDIO_VOLUME_FLAG_L_CH | PSP2_AUDIO_VOLUME_FLAG_R_CH, vols);
+    sceAudioOutSetVolume(audio_status[channel].Handle, SCE_AUDIO_VOLUME_FLAG_L_CH | SCE_AUDIO_VOLUME_FLAG_R_CH, vols);
 
     return sceAudioOutOutput(audio_status[channel].Handle, buf);
 }

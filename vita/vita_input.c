@@ -13,7 +13,7 @@ void setup_input()
 	pad = (SceCtrlData*)malloc(sizeof(SceCtrlData));
 	keymap = (uint32_t*)malloc(sizeof(uint32_t) * 12);
 
-	sceCtrlSetSamplingMode(PSP2_CTRL_MODE_ANALOG);
+	sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
 
     if (!pad || !keymap)
     {
@@ -39,12 +39,12 @@ void retro_input_poll_callback()
     }
 
     // next, handle multi-button presses (L + R or start + select)
-    if ((keys_down & PSP2_CTRL_LTRIGGER) && (keys_down & PSP2_CTRL_RTRIGGER))
+    if ((keys_down & SCE_CTRL_LTRIGGER) && (keys_down & SCE_CTRL_RTRIGGER))
     {
         handle_button_press(ActiveConfig.ButtonMap[MAP_BUTTON_LRTRIGGERS], true);
     }
 
-    if ((keys_down & PSP2_CTRL_START) && (keys_down & PSP2_CTRL_SELECT))
+    if ((keys_down & SCE_CTRL_START) && (keys_down & SCE_CTRL_SELECT))
     {
         handle_button_press(ActiveConfig.ButtonMap[MAP_BUTTON_STARTSELECT], true);
     }

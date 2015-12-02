@@ -253,18 +253,18 @@ unsigned int PhysicalButtonMap[MAP_BUTTONS] =
     0,
     0,
     0,
-    PSP2_CTRL_UP,
-    PSP2_CTRL_DOWN,
-    PSP2_CTRL_LEFT,
-    PSP2_CTRL_RIGHT,
-    PSP2_CTRL_SQUARE,
-    PSP2_CTRL_CROSS,
-    PSP2_CTRL_CIRCLE,
-    PSP2_CTRL_TRIANGLE,
-    PSP2_CTRL_LTRIGGER,
-    PSP2_CTRL_RTRIGGER,
-    PSP2_CTRL_SELECT,
-    PSP2_CTRL_START,
+    SCE_CTRL_UP,
+    SCE_CTRL_DOWN,
+    SCE_CTRL_LEFT,
+    SCE_CTRL_RIGHT,
+    SCE_CTRL_SQUARE,
+    SCE_CTRL_CROSS,
+    SCE_CTRL_CIRCLE,
+    SCE_CTRL_TRIANGLE,
+    SCE_CTRL_LTRIGGER,
+    SCE_CTRL_RTRIGGER,
+    SCE_CTRL_SELECT,
+    SCE_CTRL_START,
     0,
     0
 };
@@ -908,7 +908,7 @@ static int LoadButtonConfig()
     sprintf(path, "%s%s.cnf", pl_psp_get_app_directory(), ButtonConfigFile);
 
     /* Open file for reading */
-    SceUID file = sceIoOpen(path, PSP2_O_RDONLY, 0777);
+    SceUID file = sceIoOpen(path, SCE_O_RDONLY, 0777);
     free(path);
 
     /* If no configuration, load defaults */
@@ -943,7 +943,7 @@ static int SaveButtonConfig()
     sprintf(path, "%s%s.cnf", pl_psp_get_app_directory(), ButtonConfigFile);
 
     /* Open file for writing */
-    SceUID file = sceIoOpen(path, PSP2_O_WRONLY | PSP2_O_CREAT, 0777);
+    SceUID file = sceIoOpen(path, SCE_O_WRONLY | SCE_O_CREAT, 0777);
     free(path);
 
     if (!file) 
@@ -960,7 +960,7 @@ static int SaveButtonConfig()
 PspImage* LoadStateIcon(const char *path)
 {
     /* Open file for reading */
-    SceUID f = sceIoOpen(path, PSP2_O_RDONLY, 0777);
+    SceUID f = sceIoOpen(path, SCE_O_RDONLY, 0777);
 
     if (!f) 
         return NULL;

@@ -18,7 +18,8 @@ BUILD_PORT = $(LIBRETRO)/libretro.o $(LIBRETRO)/memory_stream.o $(VITA)/utils.o 
 OBJS = $(BUILD_APP) $(BUILD_PORT)
 
 LIBS = -lpsplib -lvita2d -lfreetype -lpng -lz -lm -lSceDisplay_stub -lSceGxm_stub 	\
-	-lSceCtrl_stub -lSceAudio_stub -lSceRtc_stub -lScePower_stub -lSceAppUtil_stub
+	-lSceCtrl_stub -lSceAudio_stub -lSceRtc_stub -lScePower_stub -lSceAppUtil_stub \
+    -lSceCommonDialog_stub
 
 DEFINES = -DPSP -DVITA -DPSP_APP_NAME=\"$(PSP_APP_NAME)\" -DPSP_APP_VER=\"$(PSP_APP_VER)\" -DHAVE_STRINGS_H \
           -DHAVE_STDINT_H -DHAVE_INTTYPES_H -D__LIBRETRO__ -DRIGHTSHIFT_IS_SAR -DINLINE=inline -DCORRECT_VRAM_READS \

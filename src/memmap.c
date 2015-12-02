@@ -773,7 +773,7 @@ static uint32 FileLoader (uint8 *buffer, const char *filename, int32 maxsize)
 	_splitpath(filename, drive, dir, name, exts);
 	_makepath(fname, drive, dir, name, exts);
 
-	if (!(fd = sceIoOpen(filename, PSP2_O_RDONLY, 0777))) 
+	if (!(fd = sceIoOpen(filename, SCE_O_RDONLY, 0777))) 
 	{
 		// printf("Couldn't get a file handle for the ROM");
 		return 0;
@@ -819,7 +819,7 @@ static uint32 FileLoader (uint8 *buffer, const char *filename, int32 maxsize)
 			else
 				more = FALSE;
 
-	}	while (more && (fd = sceIoOpen(filename, PSP2_O_RDONLY, 0777)) != NULL);
+	}	while (more && (fd = sceIoOpen(filename, SCE_O_RDONLY, 0777)) != NULL);
 
 	if (Memory.HeaderCount == 0)
 		S9xMessage(S9X_INFO, S9X_HEADERS_INFO, "No ROM file header found.");
@@ -1272,7 +1272,7 @@ static bool8 SaveSRTC (void)
 	SceUID fp;
 
 	char* __filename = S9xGetFilename(".rtc", SRAM_DIR);
-	fp = sceIoOpen(__filename, PSP2_O_WRONLY | PSP2_O_CREAT, 0777);
+	fp = sceIoOpen(__filename, SCE_O_WRONLY | SCE_O_CREAT, 0777);
 	free(__filename);
 
 	if (!fp)
@@ -1302,7 +1302,7 @@ bool8 LoadSRAM()
         strcpy(Memory.ROMFilename, Multi.fileNameB);
 
         size = (1 << (Multi.sramSizeB + 3)) * 128;
-        file = sceIoOpen(sramName, PSP2_O_RDONLY, 0777);
+        file = sceIoOpen(sramName, SCE_O_RDONLY, 0777);
 
         if (file)
         {
@@ -1322,7 +1322,7 @@ bool8 LoadSRAM()
 
     if (size)
     {
-        file = sceIoOpen(sramName, PSP2_O_RDONLY, 0777);
+        file = sceIoOpen(sramName, SCE_O_RDONLY, 0777);
 
         if (file)
         {
@@ -1351,7 +1351,7 @@ bool8 LoadSRAM()
             strcat(path, "BS-X.srm");
             free(_dir);
 
-            file = sceIoOpen(path, PSP2_O_RDONLY, 0777);
+            file = sceIoOpen(path, SCE_O_RDONLY, 0777);
 
             if (file)
             {
@@ -1401,7 +1401,7 @@ bool8 SaveSRAM ()
 		strcpy(name, sramName);
 
 		size = (1 << (Multi.sramSizeB + 3)) * 128;
-		file = sceIoOpen(name, PSP2_O_WRONLY | PSP2_O_CREAT, 0777);
+		file = sceIoOpen(name, SCE_O_WRONLY | SCE_O_CREAT, 0777);
 
 		if (file)
 		{
@@ -1418,7 +1418,7 @@ bool8 SaveSRAM ()
 
 	if (size)
 	{
-		file = sceIoOpen(sramName, PSP2_O_WRONLY | PSP2_O_CREAT, 0777);
+		file = sceIoOpen(sramName, SCE_O_WRONLY | SCE_O_CREAT, 0777);
 
 		if (file)
 		{
