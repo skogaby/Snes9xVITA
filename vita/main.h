@@ -15,7 +15,6 @@
 #include <psp2/moduleinfo.h>
 #include <psp2/types.h>
 
-#include "revitalize.h"
 #include "utils.h"
 #include "vita_input.h"
 #include "vita_audio.h"
