@@ -17,7 +17,7 @@ BUILD_PORT = $(LIBRETRO)/libretro.o $(LIBRETRO)/memory_stream.o $(VITA)/utils.o 
 
 OBJS = $(BUILD_APP) $(BUILD_PORT)
 
-LIBS = -lpsplib -lvita2d -lfreetype -lpng -lz -lm -lSceDisplay_stub -lSceGxm_stub 	\
+LIBS = -lpsplib -lvita2d -lfreetype -lpng -lz -lm -lSceCommonDialog_stub -lSceSysmodule_stub -lSceDisplay_stub -lSceGxm_stub 	\
 	-lSceCtrl_stub -lSceAudio_stub -lSceRtc_stub -lScePower_stub -lSceAppUtil_stub \
     -lSceCommonDialog_stub
 
@@ -40,11 +40,15 @@ ASFLAGS = $(CFLAGS)
 
 
 
-all: $(TARGET).velf
+all: eboot.bin
+
+eboot.bin: $(TARGET).velf
+	vita-make-fself $(TARGET).velf eboot.bin
+	vita-mksfoex -s TITLE_ID=SKOG00001 "Snes9xVITA" param.sfo
 
 $(TARGET).velf: $(TARGET).elf
 		$(PREFIX)-strip -g $<
-		vita-elf-create  $< $@ ./db.json ./extra.json
+		vita-elf-create  $< $@ 
 
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $(ASFLAGS) $^ $(LIBS) -o $@
