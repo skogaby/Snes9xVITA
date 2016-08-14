@@ -40,7 +40,17 @@ ASFLAGS = $(CFLAGS)
 
 
 
-all: eboot.bin
+all: package
+
+package: $(TARGET).vpk
+
+$(TARGET).vpk: eboot.bin
+	vita-pack-vpk -s param.sfo -b eboot.bin \
+		--add sce_sys/icon0.png=sce_sys/icon0.png \
+		--add sce_sys/livearea/contents/bg.png=sce_sys/livearea/contents/bg.png \
+		--add sce_sys/livearea/contents/startup.png=sce_sys/livearea/contents/startup.png \
+		--add sce_sys/livearea/contents/template.xml=sce_sys/livearea/contents/template.xml \
+	$(TARGET).vpk
 
 eboot.bin: $(TARGET).velf
 	vita-make-fself $(TARGET).velf eboot.bin
@@ -54,9 +64,8 @@ $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $(ASFLAGS) $^ $(LIBS) -o $@
 
 clean:
-	@rm -rf $(TARGET).elf $(TARGET).velf $(OBJS) $(DATA)/*.h
+	@rm -rf param.sfo eboot.bin $(TARGET).vpk $(TARGET).elf $(TARGET).velf $(OBJS) $(DATA)/*.h
 
 copy: $(TARGET).velf
 	@cp $(TARGET).velf ~/shared/vitasample.elf
 	@echo "Copied!"
-    

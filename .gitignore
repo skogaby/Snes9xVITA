@@ -46,6 +46,9 @@ Temporary Items
 **/*.o
 **/*.elf
 **/*.velf
+**/*.bin
+**/*.vpk
+param.sfo
 
 
 # ==========================
