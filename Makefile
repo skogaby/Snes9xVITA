@@ -40,7 +40,7 @@ ASFLAGS = $(CFLAGS)
 
 
 
-all: eboot.bin
+all: package
 
 package: $(TARGET).vpk
 
